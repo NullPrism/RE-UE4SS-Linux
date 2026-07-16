@@ -42,6 +42,7 @@
 
 - Do not unload UE4SS with `dlclose`.
 - Stop the host process to unload the loader.
+- Normal host-process shutdown did not invoke native mod `uninstall_mod` or the C++ destructor during validation.
 - Native private C++ members are not automatically exposed as reflected Lua
   properties.
 - Dependency commits are not yet guaranteed to be reachable through stable

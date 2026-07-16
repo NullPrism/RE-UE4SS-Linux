@@ -1,5 +1,13 @@
 # Source Provenance
 
+## Current downstream
+
+Repository: `NullPrism/RE-UE4SS-Linux`
+
+Primary branch: `main`
+
+This repository is an unofficial native Linux downstream. It is not affiliated with or supported by the official UE4SS project.
+
 ## Official upstream
 
 Repository: `UE4SS-RE/RE-UE4SS`

@@ -1,6 +1,24 @@
 # Native Linux support
 
-UE4SS Milestone 1 supports native x86-64 Linux builds for headless Unreal Engine 5.1+ games and dedicated servers. Palworld's native Linux dedicated server is the binding target. Windows builds and the existing Linux-to-Windows cross-compilation workflows remain unchanged.
+This downstream supports native x86-64 Linux builds for headless Unreal Engine games and dedicated servers. Palworld's native Linux dedicated server on Unreal Engine 5.1 is the binding validated target.
+
+The repository retains inherited Windows and Linux-to-Windows cross-compilation infrastructure, but this downstream's compatibility claims and active runtime validation focus on native Linux.
+
+## Validation status
+
+The core Linux loader path has passed live Palworld acceptance testing for:
+
+- native loader initialization and signature resolution;
+- Lua mod discovery and lifecycle callbacks;
+- reflected object, property, UFunction, and hook access;
+- controlled reflected property writes and restoration;
+- repeated fresh-process startup and graceful shutdown;
+- native C++ shared-object discovery and lifecycle callbacks;
+- native C++ read-only Unreal access;
+- repeated native C++ loading across fresh host processes;
+- scoped SELinux execution without global `execheap`.
+
+These results apply only to the exact combinations recorded in the [compatibility matrix](linux/COMPATIBILITY.md). Existing third-party mod compatibility remains pending.
 
 ## Requirements
 
@@ -28,6 +46,8 @@ Clone all submodules before configuring:
 ```bash
 git submodule update --init --recursive
 ```
+
+The current source tree includes a pinned UEPseudo dependency that may require authorized repository access. Public source bootstrapping is not guaranteed until all pinned dependency revisions are available through stable public remotes.
 
 ## Build with CMake
 
@@ -139,7 +159,7 @@ With `[CrashDump] EnableDumping = 1`, Linux installs signal handlers for `SIGSEG
 
 If a required engine version or signature cannot be resolved, UE4SS is designed to log the failure and deactivate without terminating the host server. Diagnose mode makes that inactive reason explicit.
 
-## Milestone 1 limitations
+## Current limitations
 
 - Headless Unreal Engine 5.1+ and dedicated-server use only
 - x86-64 only; ARM64 is not supported
@@ -149,4 +169,6 @@ If a required engine version or signature cannot be resolved, UE4SS is designed 
 - No ptrace/attach injector; native loading uses `LD_PRELOAD`
 - Linux crash handling produces signal backtraces, not minidumps
 
-Object dumping, CXX header generation, USMAP generation, Lua mods, C++ `.so` mods, and console/file logging are part of the M1 target, but the port is not considered complete until the live Palworld acceptance suite passes all eight gates documented in the approved Linux-port design.
+The core live Palworld acceptance gates for loader startup, Lua behavior, reflection, hooks, repeated process lifecycle, and native C++ mod loading have passed for the validated target.
+
+This milestone does not establish general Unreal Engine compatibility. Existing third-party mod compatibility, additional games and engine versions, public dependency availability, and production deployment remain outside the validated scope.
