@@ -34,7 +34,7 @@ jobs:
       - name: Install native build tools
         run: |
           sudo apt-get update
-          sudo apt-get install --yes clang-20 lld-20 llvm-20 ninja-build
+          sudo apt-get install --yes clang-20 lld-20 llvm-20 ninja-build file binutils gzip
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -61,6 +61,54 @@ jobs:
 
       - name: Test
         run: ctest --test-dir build_linux_ci --output-on-failure
+
+      - name: Package Linux runtime
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          package_version="ci-${GITHUB_SHA::12}"
+          output_dir="${GITHUB_WORKSPACE}/dist/linux-runtime"
+          loader="${GITHUB_WORKSPACE}/build_linux_ci/Game__Shipping__Linux/lib/libUE4SS.so"
+
+          tools/release/package-linux-runtime.sh \
+            --loader "${loader}" \
+            --version "${package_version}" \
+            --output-dir "${output_dir}" \
+            --source-commit "${GITHUB_SHA}" \
+            --loader-source-commit "${GITHUB_SHA}"
+
+          printf 'package_version=%s\n' \
+            "${package_version}" \
+            >> "${GITHUB_OUTPUT}"
+
+          printf 'output_dir=%s\n' \
+            "${output_dir}" \
+            >> "${GITHUB_OUTPUT}"
+
+      - name: Verify Linux runtime package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          package_version="${{ steps.package.outputs.package_version }}"
+          output_dir="${{ steps.package.outputs.output_dir }}"
+
+          tools/ci/verify-linux-runtime-package.sh \
+            "${output_dir}/RE-UE4SS-Linux-${package_version}-x86_64.tar.gz" \
+            "${output_dir}/RE-UE4SS-Linux-${package_version}-x86_64-debug.tar.gz"
+
+      - name: Upload Linux runtime packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: RE-UE4SS-Linux-x86_64-${{ github.sha }}
+          path: |
+            ${{ steps.package.outputs.output_dir }}/*.tar.gz
+            ${{ steps.package.outputs.output_dir }}/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
 
   xmake-build:
     name: xmake / clang

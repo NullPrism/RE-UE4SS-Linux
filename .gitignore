@@ -82,3 +82,5 @@ vsxmake2022
 
 # xwin
 xwin/*
+
+/dist/
