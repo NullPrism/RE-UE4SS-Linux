@@ -140,6 +140,7 @@ output_dir="$(
 
 required_files=(
     "$repo_root/tools/linux/run_ue4ss.sh"
+    "$repo_root/tools/ci/verify-disabled-mod-defaults.py"
     "$repo_root/assets/UE4SS-settings.ini"
     "$repo_root/packaging/linux/INSTALL.md"
     "$repo_root/docs/linux/PROVENANCE.md"
@@ -158,6 +159,10 @@ if [[ ! -d "$repo_root/assets/Mods" ]]; then
     echo "ERROR: bundled Mods directory is missing." >&2
     exit 1
 fi
+
+"$repo_root/tools/ci/verify-disabled-mod-defaults.py" \
+    "$repo_root/assets/Mods/mods.json" \
+    "$repo_root/assets/Mods/mods.txt"
 
 objcopy="$(
     find_tool \
@@ -353,6 +358,10 @@ install -m 0644 \
 cp -a \
     "$repo_root/assets/Mods/." \
     "$runtime_root/Mods/"
+
+"$repo_root/tools/ci/verify-disabled-mod-defaults.py" \
+    "$runtime_root/Mods/mods.json" \
+    "$runtime_root/Mods/mods.txt"
 
 find "$runtime_root" \
     -type d \

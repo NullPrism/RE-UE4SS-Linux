@@ -261,6 +261,21 @@ do
     fi
 done
 
+disabled_mod_verifier="$(
+    cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+    pwd -P
+)/verify-disabled-mod-defaults.py"
+
+if [[ ! -x "$disabled_mod_verifier" ]]; then
+    echo "ERROR: bundled-mod verifier is missing or not executable:" >&2
+    echo "$disabled_mod_verifier" >&2
+    exit 1
+fi
+
+"$disabled_mod_verifier" \
+    "$runtime_root/Mods/mods.json" \
+    "$runtime_root/Mods/mods.txt"
+
 runtime_description="$(
     file \
         -b \
