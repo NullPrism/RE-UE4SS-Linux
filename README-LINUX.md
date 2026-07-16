@@ -17,6 +17,7 @@ Experimental. This project is not yet recommended for production servers.
 - Native-to-Lua callbacks
 - UObject, UClass, UWorld, FName, FString, and FText access
 - Reflected primitive numeric property reads
+- Controlled reflected numeric property write, readback, and restoration
 - Scoped SELinux operation without global `execheap`
 
 ## Scope
