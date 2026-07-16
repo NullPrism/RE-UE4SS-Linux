@@ -34,7 +34,7 @@
 | Reflected UFunction primitive parameters | Pass |
 | Hook parameter handling | Pass |
 | Repeated startup/shutdown | Pass |
-| Native C++ mod loading | Pending |
+| Native C++ mod loading | Pass |
 | Existing third-party mod compatibility | Pending |
 
 ## Limitations

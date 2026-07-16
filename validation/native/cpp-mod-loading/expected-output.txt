@@ -1,0 +1,7 @@
+[NullPrismNativeAcceptance] start_mod export
+[NullPrismNativeAcceptance] constructor
+[NullPrismNativeAcceptance] on_cpp_mods_loaded
+[NullPrismNativeAcceptance] on_unreal_init
+[NullPrismNativeAcceptance] StaticFindObject result=valid
+[NullPrismNativeAcceptance] RESULT=PASS
+[NullPrismNativeAcceptance] on_program_start

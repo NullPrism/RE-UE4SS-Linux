@@ -1,0 +1,8 @@
+{
+    global:
+        start_mod;
+        uninstall_mod;
+
+    local:
+        *;
+};
