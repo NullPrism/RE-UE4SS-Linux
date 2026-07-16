@@ -83,8 +83,54 @@ jobs:
         with:
           xmake-version: '2.9.3'
 
+      - name: Diagnose C++23 toolchain
+        run: |
+          set -euxo pipefail
+
+          clang --version
+          clang++ --version
+          cmake --version
+          xmake --version
+
+          cat > /tmp/std-expected.cpp <<'EOF'
+          #include <expected>
+
+          int main()
+          {
+              std::expected<int, int> result{42};
+              return result.value() == 42 ? 0 : 1;
+          }
+          EOF
+
+          clang++             -std=c++23             /tmp/std-expected.cpp             -o /tmp/std-expected
+
+          /tmp/std-expected
+
       - name: Configure
-        run: xmake f -p linux -a x86_64 -m Game__Shipping__Linux -y
+        run: |
+          xmake f             -p linux             -a x86_64             -m Game__Shipping__Linux             -y             -vD
+
+      - name: Dump xmake package failure logs
+        if: ${{ failure() }}
+        run: |
+          set -o pipefail
+
+          echo '=== Failed xmake package logs ==='
+
+          found=0
+
+          while IFS= read -r -d '' logfile; do
+            found=1
+            echo
+            echo "===== ${logfile} ====="
+            sed -n '1,500p' "${logfile}"
+          done < <(
+            find "${HOME}/.xmake"               -type f               -path '*/installdir.failed/logs/*'               -print0 2>/dev/null
+          )
+
+          if [[ "${found}" -eq 0 ]]; then
+            echo 'No failed package logs found.'
+          fi
 
       - name: Build UE4SS
         run: xmake build -j 2 -y UE4SS
