@@ -8,6 +8,7 @@
 #include <Windows.h>
 
 #include <Helpers/SysError.hpp>
+#include <Helpers/String.hpp>
 
 namespace RC::Platform
 {
@@ -46,7 +47,7 @@ namespace RC::Platform
         m_handle = LoadLibraryExW(path.c_str(), nullptr, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
         if (!m_handle)
         {
-            m_error = SysError(GetLastError()).c_str();
+            m_error = RC::to_string(SysError(GetLastError()));
             if (m_search_path_cookie)
             {
                 RemoveDllDirectory(m_search_path_cookie);
@@ -68,7 +69,7 @@ namespace RC::Platform
         auto* symbol = reinterpret_cast<void*>(GetProcAddress(static_cast<HMODULE>(m_handle), symbol_name));
         if (!symbol)
         {
-            m_error = SysError(GetLastError()).c_str();
+            m_error = RC::to_string(SysError(GetLastError()));
             return nullptr;
         }
         m_error.clear();

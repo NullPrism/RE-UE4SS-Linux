@@ -1,0 +1,15 @@
+diff --git a/include/Unreal/NameTypes.hpp b/include/Unreal/NameTypes.hpp
+index 5c8ea29..1d321d5 100644
+--- a/include/Unreal/NameTypes.hpp
++++ b/include/Unreal/NameTypes.hpp
+@@ -294,8 +294,8 @@ namespace RC::Unreal
+         // Not safe to use for return values from Unreal Engine internals
+         explicit FName(uint32_t IndexParam, uint32_t DisplayIndexParam, uint32_t NumberParam)
+         {
+-            ComparisonIndex = IndexParam;
+-            DisplayIndex = DisplayIndexParam;
++            ComparisonIndex = FNameEntryId::FromUnstableInt(IndexParam);
++            DisplayIndex = FNameEntryId::FromUnstableInt(DisplayIndexParam);
+             Number = NumberParam;
+         }
+ #endif

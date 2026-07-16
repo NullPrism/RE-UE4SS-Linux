@@ -2,6 +2,8 @@
 
 #include <system_error>
 
+#include <String/StringType.hpp>
+
 namespace RC
 {
     inline const std::error_category& default_error_category() noexcept
