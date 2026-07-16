@@ -30,7 +30,7 @@
 | FText property read | Pass |
 | Reflected numeric property read | Pass |
 | Reflected property write | Pass |
-| Reflected UFunction invocation | Pending |
+| Reflected UFunction invocation | Pass |
 | Hook parameter handling | Pending |
 | Repeated startup/shutdown | Pending |
 | Native C++ mod loading | Pending |

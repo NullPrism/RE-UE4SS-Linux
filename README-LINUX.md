@@ -18,6 +18,7 @@ Experimental. This project is not yet recommended for production servers.
 - UObject, UClass, UWorld, FName, FString, and FText access
 - Reflected primitive numeric property reads
 - Controlled reflected numeric property write, readback, and restoration
+- Read-only reflected UFunction lookup, invocation, and primitive return conversion
 - Scoped SELinux operation without global `execheap`
 
 ## Scope

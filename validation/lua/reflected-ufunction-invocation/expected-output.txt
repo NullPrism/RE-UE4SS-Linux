@@ -1,0 +1,16 @@
+[NullPrismReflectedUFunction] main.lua loaded
+[NullPrismReflectedUFunction] InitGameState post-hook registered
+[NullPrismReflectedUFunction] InitGameState post-hook fired
+[NullPrismReflectedUFunction] candidate GetActorTimeDilation Lua type=userdata
+[NullPrismReflectedUFunction] candidate GetActorTimeDilation userdata IsValid=true
+[NullPrismReflectedUFunction] candidate GetActorTimeDilation full name=Function /Script/Engine.Actor:GetActorTimeDilation
+[NullPrismReflectedUFunction] candidate GetActorTimeDilation resolution=valid callable userdata
+[NullPrismReflectedUFunction] selected function=GetActorTimeDilation
+[NullPrismReflectedUFunction] invocation completed
+[NullPrismReflectedUFunction] return Lua type=number
+[NullPrismReflectedUFunction] return value=1.0
+[NullPrismReflectedUFunction] numeric return finite=true
+[NullPrismReflectedUFunction] getter/property delta=0.0
+[NullPrismReflectedUFunction] return type verification=true
+[NullPrismReflectedUFunction] RESULT=PASS
+[NullPrismReflectedUFunction] test completed
