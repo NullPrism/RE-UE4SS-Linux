@@ -16,6 +16,9 @@ compatibility matrix before deploying it to a production server.
 - `BUILD-METADATA.txt`: source and artifact identities
 - `SHA256SUMS`: checksums for files inside this package
 
+Bundled mods are disabled by default. Enable only the individual mods required
+for the target server after reviewing their behavior and compatibility.
+
 Debug symbols are distributed separately.
 
 ## Verify the package

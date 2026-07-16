@@ -1,15 +1,15 @@
-CheatManagerEnablerMod : 1
+CheatManagerEnablerMod : 0
 ActorDumperMod : 0
-ConsoleCommandsMod : 1
-ConsoleEnablerMod : 1
+ConsoleCommandsMod : 0
+ConsoleEnablerMod : 0
 SplitScreenMod : 0
-LineTraceMod : 1
-BPML_GenericFunctions : 1
-BPModLoaderMod : 1
+LineTraceMod : 0
+BPML_GenericFunctions : 0
+BPModLoaderMod : 0
 jsbLuaProfilerMod : 0
 
 
 
 
 ; Built-in keybinds, do not move up!
-Keybinds : 1
+Keybinds : 0
