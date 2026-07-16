@@ -29,7 +29,7 @@
 | FString property read | Pass |
 | FText property read | Pass |
 | Reflected numeric property read | Pass |
-| Reflected property write | Pending |
+| Reflected property write | Pass |
 | Reflected UFunction invocation | Pending |
 | Hook parameter handling | Pending |
 | Repeated startup/shutdown | Pending |

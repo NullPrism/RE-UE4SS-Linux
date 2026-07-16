@@ -1,0 +1,16 @@
+[NullPrismReflectedPropertyWrite] main.lua loaded
+[NullPrismReflectedPropertyWrite] InitGameState post-hook registered
+[NullPrismReflectedPropertyWrite] InitGameState post-hook fired
+[NullPrismReflectedPropertyWrite] original Lua type=number
+[NullPrismReflectedPropertyWrite] original value=1.0
+[NullPrismReflectedPropertyWrite] temporary target=0.99
+[NullPrismReflectedPropertyWrite] temporary write completed
+[NullPrismReflectedPropertyWrite] temporary readback Lua type=number
+[NullPrismReflectedPropertyWrite] temporary readback value=<approximately 0.99>
+[NullPrismReflectedPropertyWrite] temporary readback verified=true
+[NullPrismReflectedPropertyWrite] restore write completed
+[NullPrismReflectedPropertyWrite] restored readback Lua type=number
+[NullPrismReflectedPropertyWrite] restored readback value=1.0
+[NullPrismReflectedPropertyWrite] restore verified=true
+[NullPrismReflectedPropertyWrite] RESULT=PASS
+[NullPrismReflectedPropertyWrite] test completed
