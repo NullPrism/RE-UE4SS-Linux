@@ -1,456 +1,264 @@
-# Unreal Engine 4/5 Scripting System
+# RE-UE4SS Linux
 
-Lua scripting system platform, C++ Modding API, SDK generator, blueprint mod loader, live property editor and other dumping utilities for UE4/5 games.
+[![Native Linux](https://github.com/NullPrism/RE-UE4SS-Linux/actions/workflows/linux-test.yml/badge.svg?branch=main)](https://github.com/NullPrism/RE-UE4SS-Linux/actions/workflows/linux-test.yml)
 
-## Major features
+An unofficial downstream native Linux port and distribution of RE-UE4SS for
+headless Unreal Engine games and dedicated servers.
 
-- [Lua Scripting API](https://docs.ue4ss.com/dev/lua-api.html): Write lua mods based on the UE object system
-- [Blueprint Modloading](https://docs.ue4ss.com/dev/feature-overview/blueprint-modloader.html): Spawn blueprint mods automatically without editing/replacing game files
-- [C++ Modding API](https://docs.ue4ss.com/dev/guides/creating-a-c%2B%2B-mod.html): Write C++ mods based on the UE object system
-- [Live Property Viewer and Editor](https://docs.ue4ss.com/dev/feature-overview/live-view.html): Search, view, edit & watch the properties of every loaded object, great for debugging mods or figuring out how values are changed during runtime
-- [UHT Dumper](https://docs.ue4ss.com/dev/feature-overview/dumpers.html#unreal-header-tool-uht-dumper): Generate Unreal Header Tool compatible C++ headers for creating a mirror .uproject for your game
-- [C++ Header Dumper](https://docs.ue4ss.com/dev/feature-overview/dumpers.html#c-header-generator): Generate standard C++ headers from reflected classes and blueprints, with offsets
-- [Universal UE Mods](https://docs.ue4ss.com/dev/feature-overview/universal-mods.html): Unlock the game console and other universal mods
-- [Dumpers for File Parsing](https://docs.ue4ss.com/dev/feature-overview/dumpers.html#usmap-dumper): Generate `.usmap` mapping files for unversioned properties
-- [UMAP Recreation Dumper](https://docs.ue4ss.com/dev/feature-overview/dumpers.html#umap-recreation-dumper): Dump all loaded actors to file to generate `.umaps` in-editor
-- Other Features, including [Experimental](https://docs.ue4ss.com/dev/feature-overview/experimental.html) features at times
+The current binding target is the native Linux Palworld Dedicated Server on
+Unreal Engine 5.1.
 
-## Targeting UE Versions: From 4.12 To 5.7
+> This project is not affiliated with or supported by the official UE4SS
+> project or Pocketpair.
 
-The goal of UE4SS is not to be a plug-n-play solution that always works with every game.
-The goal is to have an underlying system that works for most games.
-You may need to update AOBs on your own, and there's a guide for that below.
+## Project status
 
-## Basic Installation
+**Experimental, with a validated working core loader path.**
 
-The easiest installation is via downloading the non-dev version of the latest non-experimental build from [Releases](https://github.com/UE4SS-RE/RE-UE4SS/releases/latest) and extracting the zip content to `{game directory}/GameName/Binaries/Win64/`.
+The project has passed live acceptance testing for native loader startup, Lua
+mods, reflected Unreal access, hooks, native C++ mods, and repeated fresh-process
+startup and shutdown on the validated Palworld target.
 
-If your game is in the custom config list, extract the contents from the relevant folder to `Win64` as well.
+This does not establish compatibility with every Unreal Engine game, engine
+version, Linux distribution, or existing third-party mod.
 
-If you are planning on doing mod development using UE4SS, you can do the same as above but download the zDEV version instead.
+Production deployment is not yet recommended until broader game and
+third-party-mod compatibility has been established.
 
-### Command Line Options
+Public source builds also currently depend on access to the pinned UEPseudo
+submodule revision. Dependency availability and reproducible public source
+bootstrapping remain active project concerns.
 
-If RE-UE4SS is installed via proxy DLL, the following command line options are available:
+## Validated target
 
-- `--disable-ue4ss` - Temporarily disable UE4SS without uninstalling by launching the game with this argument.
-- `--ue4ss-path <path>` - Specify a custom path to UE4SS.dll. Supports both absolute paths (e.g., `C:\custom\UE4SS.dll`) and relative paths (e.g., `dev\builds\UE4SS.dll` relative to the game executable directory). Useful for testing different UE4SS builds without modifying installation files. 
+| Component | Validated value |
+|---|---|
+| Game | Palworld Dedicated Server |
+| Game version | 1.0.1.100619 |
+| Steam build ID | 24181105 |
+| Unreal Engine | 5.1.1 |
+| Architecture | x86-64 |
+| Distribution | Fedora Linux |
+| Loading method | Process-lifetime `LD_PRELOAD` |
+| Imported Linux baseline | `407d14cf3c485a150cd157fd581643c901dd9b0e` |
 
-### Environment Variables
+See the complete [Linux compatibility matrix](docs/linux/COMPATIBILITY.md).
 
-RE-UE4SS supports the following environment variables:
+## Validated functionality
 
-- `UE4SS_MODS_PATHS` - Semicolon-separated list of additional mods directories to load. Paths are processed in reverse order (first entry has highest priority), similar to the `PATH` variable. Example: `C:\SharedMods;D:\GameMods;E:\TestMods`.
+The following capabilities have passed live testing on the validated target:
 
-## Links
+- Native x86-64 Linux UE4SS startup through `LD_PRELOAD`
+- Process-scoped launcher behavior for wrapper-based servers
+- Palworld Dedicated Server initialization and signature resolution
+- Lua mod discovery and execution
+- Native lifecycle hook registration
+- Native-to-Lua callbacks
+- UObject, UClass, UWorld, FName, FString, and FText access
+- Reflected primitive numeric property reads
+- Controlled reflected property write, readback, and restoration
+- Reflected UFunction discovery and invocation
+- Primitive UFunction input and return-value marshalling
+- Reflected hook context and primitive-parameter handling
+- Native Linux C++ `.so` mod discovery and loading
+- Native C++ lifecycle callbacks and read-only Unreal access
+- Repeated native C++ mod loading across fresh PalServer processes
+- Repeated startup and graceful shutdown without surviving processes
+- Scoped SELinux operation without enabling global `execheap`
 
-  [Full installation guide](https://docs.ue4ss.com/dev/installation-guide.html)
+The acceptance fixtures and recorded results are maintained under
+[`validation/`](validation/).
 
-  [Fixing compatibility problems](https://docs.ue4ss.com/dev/guides/fixing-compatibility-problems.html)
+## Current scope
 
-  [Lua API - Overview](https://docs.ue4ss.com/dev/lua-api.html)
+This downstream currently targets:
 
-  [Generating UHT compatible headers](https://docs.ue4ss.com/dev/guides/generating-uht-compatible-headers.html)
+- Native x86-64 Linux
+- Headless Unreal Engine servers and games
+- Unreal Engine 5.1 as the binding validated engine
+- Clang and C++23
+- CMake/Ninja and xmake builds
+- Lua mods
+- Native C++ mods compiled as ELF shared objects
 
-  [Custom Game Configs](https://docs.ue4ss.com/dev/custom-game-configs.html)
+The repository retains inherited cross-platform source and build infrastructure,
+but this downstream's compatibility claims and active validation focus on native
+Linux.
 
-  [Creating Compatible Blueprint Mods](https://www.youtube.com/watch?v=fB3yT85XhVA)
-
-  [UE4SS Discord Server Invite](https://discord.gg/7qhRGHF9Tt)
-
-  [Unreal Engine Modding Discord Server Invite](https://discord.gg/unreal-engine-modding-876613187204685934)
+For supported Windows builds and the established Windows UE4SS ecosystem, use
+the official upstream UE4SS project.
 
 ## Build requirements
 
-- Windows, or x86-64 Linux for the native headless UE 5.1+ target.
-- A compiler with C++23 support:
-  - Windows: MSVC toolset version >= 14.43.0, MSVC version >= 19.43, Visual Studio version >= 17.13.
-  - Native Linux: clang, glibc >= 2.35, and GLIBCXX >= 3.4.32. GCC is not supported for the native port.
-- [Rust toolchain >= 1.73.0](https://www.rust-lang.org/tools/install)
-- [CMake >= 3.22](https://cmake.org/download/)
-- A build system: either [Ninja](https://ninja-build.org/) or MSVC (included with Visual Studio)
+The current Linux build requires:
 
-See [Native Linux support](docs/linux.md) for the current headless scope, build commands, server staging, diagnostics, and known limitations.
+- x86-64 Linux
+- glibc 2.35 or newer
+- Clang with C++23 support
+- CMake 3.22 or newer and Ninja, or xmake 2.9.3
+- Rust 1.73 or newer
+- Access to all pinned Git submodules
 
-## Build instructions
+GCC is not a supported compiler for this downstream.
 
-1. Clone the repo.
-2. Execute this command: `git submodule update --init --recursive`
-    Make sure your Github account is linked to your Epic Games account for UE source access.
-    Do not use the `--remote` option because that will force third-party dependencies to update to the latest commit, and that can break things.
-    You will need your github account to be linked to an Epic games account to pull the Unreal pseudo code submodule.
+Detailed prerequisites, build commands, staging instructions, and diagnostics
+are documented in the [native Linux guide](docs/linux.md).
 
-There are several different ways you can build UE4SS.
+### CMake
 
-## Building from CLI
+    git submodule update --init --recursive
 
-### Build Modes
+    cmake -S . -B build_linux -G Ninja \
+      -DCMAKE_C_COMPILER=clang \
+      -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_BUILD_TYPE=Game__Shipping__Linux \
+      -DUE4SS_GUI=OFF \
+      -DUE4SS_BUILD_TESTS=ON
 
-The build modes are structured as follows: `<Target>__<Config>__<Platform>`
+    cmake --build build_linux --parallel
+    ctest --test-dir build_linux --output-on-failure
 
-Currently supported options for these are:
+### xmake
 
-* `Target`
-  * `Game` - for regular games on UE versions greater than UE 4.21
-  * `LessEqual421` - for regular games on UE versions less than or equal to UE 4.21
-  * `CasePreserving` - for games built with case preserving enabled
+    git submodule update --init --recursive
 
-* `Config`
-  * `Dev` - development build
-  * `Debug` - debug build
-  * `Shipping` - shipping(release) build
-  * `Test` - build for tests
+    xmake f -p linux -a x86_64 -m Game__Shipping__Linux -y
+    xmake build -j "$(nproc)" -y UE4SS
 
-* `Platform`
-  * `Win64` - 64-bit windows
-  * `Linux` - native 64-bit Linux (headless, clang)
+The active Native Linux workflow validates both build systems with Clang.
 
-### Basic Build Commands
+## Runtime layout
 
-To build UE4SS with CMake, use the following commands:
+UE4SS resolves its settings, mods, logs, and generated output relative to
+`libUE4SS.so`.
 
-```bash
-# Configure with Ninja (recommended for faster builds, single-configuration)
-cmake -B build_cmake_Game__Shipping__Win64 -G Ninja -DCMAKE_BUILD_TYPE=Game__Shipping__Win64
+A staged server generally uses this layout:
 
-# Build with Ninja
-cmake --build build_cmake_Game__Shipping__Win64
+    Pal/Binaries/Linux/
+    ├── libUE4SS.so
+    ├── run_ue4ss.sh
+    ├── UE4SS-settings.ini
+    ├── UE4SS.log
+    ├── UE4SS-crashes/
+    └── Mods/
 
-# Or configure with MSVC (multi-configuration, allows switching configs without reconfiguring)
-cmake -B build_cmake_Game__Shipping__Win64 -G "Visual Studio 17 2022"
+Use the supplied launcher rather than adding `LD_PRELOAD` globally:
 
-# Build with MSVC (requires --config flag)
-cmake --build build_cmake_Game__Shipping__Win64 --config Game__Shipping__Win64
-```
+    export PALWORLD_SERVER_ROOT=/srv/palworld
 
-### Native Linux (headless)
+    stage="$PALWORLD_SERVER_ROOT/Pal/Binaries/Linux"
+    server="$stage/PalServer-Linux-Shipping"
+    wrapper="$PALWORLD_SERVER_ROOT/PalServer.sh"
 
-```bash
-cmake -S . -B build_linux -G Ninja \
-  -DCMAKE_C_COMPILER=clang \
-  -DCMAKE_CXX_COMPILER=clang++ \
-  -DCMAKE_BUILD_TYPE=Game__Shipping__Linux \
-  -DUE4SS_GUI=OFF \
-  -DUE4SS_BUILD_TESTS=ON
-cmake --build build_linux --parallel
-ctest --test-dir build_linux --output-on-failure
-```
+    cd "$PALWORLD_SERVER_ROOT"
 
-The native Linux M1 target is intended for UE 5.1+ dedicated servers and other headless processes. Deployment uses `libUE4SS.so` with the provided `tools/linux/run_ue4ss.sh` launcher:
+    UE4SS_CRASH_LOG_DIR="$stage/UE4SS-crashes" \
+      "$stage/run_ue4ss.sh" \
+      --host-executable "$server" \
+      "$wrapper" \
+      -useperfthreads \
+      -NoAsyncLoadingThread \
+      -UseMultithreadForDS
 
-```bash
-# Direct ELF
-run_ue4ss.sh /path/to/PalServer-Linux-Shipping Pal -port=8211
+The launcher identifies the intended host ELF, preserves the user's original
+`LD_PRELOAD`, and removes the launcher-added UE4SS preload before the game
+starts child processes.
 
-# Shell wrapper: identify the ELF that should initialize UE4SS
-run_ue4ss.sh \
-  --host-executable /path/to/PalServer-Linux-Shipping \
-  /path/to/PalServer.sh -port=8211
-```
+Manual `LD_PRELOAD` remains possible, but it retains normal Linux environment
+inheritance and is not the supported process-scoped workflow.
 
-The Linux launcher restores the user's original `LD_PRELOAD` before the selected host starts helpers, preventing the launcher-added UE4SS preload from spreading through the process tree. Raw manual `LD_PRELOAD` remains compatible but keeps normal Linux child inheritance. Windows proxy/manual DLL injection is already process-scoped. See [docs/linux.md](docs/linux.md) for staging, diagnostics, and troubleshooting.
+## Mod support
 
-### Configuration Options
+### Lua mods
 
-CMake allows you to configure various build options. Here are some useful options:
+Lua mods use the standard UE4SS `Mods` structure. The Linux acceptance suite
+has validated mod discovery, lifecycle callbacks, reflected properties,
+UFunction calls, and hook parameter handling.
 
-#### Proxy Path
+### Native C++ mods
 
-By default, UE4SS generates a proxy based on `C:\Windows\System32\dwmapi.dll`. To change this, set the CMake variable:
+A native Linux C++ mod is loaded from:
 
-```bash
-cmake -B build -DUE4SS_PROXY_PATH="<path to proxy dll>" -DCMAKE_BUILD_TYPE=Game__Shipping__Win64
-```
+    Mods/<ModName>/dlls/main.so
 
-#### Profiler Flavor
+The shared object must export:
 
-By default, UE4SS has profiling disabled (`None`). To enable profiling, you need both a profiler flavor AND a build configuration that includes STATS:
+    start_mod
+    uninstall_mod
 
-```bash
-# STATS are enabled by default in Dev and Test builds
-cmake -B build -DPROFILER_FLAVOR=<Tracy|Superluminal|None> -DCMAKE_BUILD_TYPE=Game__Dev__Win64
-```
+Native C++ mods are ABI-coupled to UE4SS. They must be built against the same
+UE4SS source revision, headers, build configuration, compiler/runtime strategy,
+and compatible C++ ABI as the loader that will load them.
 
-> [!NOTE]
-> Profiling requires STATS support. By default, `Dev` and `Test` configurations include STATS, while `Shipping` and `Debug` do not. You can manually enable STATS for any configuration by adding compile definitions:
-> ```bash
-> cmake -B build -DPROFILER_FLAVOR=Tracy -DCMAKE_BUILD_TYPE=Game__Shipping__Win64 -DCMAKE_CXX_FLAGS="-DSTATS"
-> ```
+The reference acceptance fixture is located at
+[`validation/native/cpp-mod-loading/`](validation/native/cpp-mod-loading/).
 
-### Helpful CMake Commands
+Normal PalServer host-process shutdown did not call the native mod's
+`uninstall_mod` export or C++ destructor during validation. The operating system
+reclaimed the module when the host process terminated.
 
-| Command | Description |
-| --- | --- |
-| `cmake -B <build_dir> -G <generator>` | Configure the project with a specific generator (Ninja or "Visual Studio 17 2022") |
-| `cmake --build <build_dir>` | Build with Ninja (single-config generator) |
-| `cmake --build <build_dir> --config <mode>` | Build with MSVC (multi-config generator, `--config` required) |
-| `cmake --build <build_dir> --clean-first` | Clean and rebuild (add `--config <mode>` for MSVC) |
-| `cmake --build <build_dir> --target <target>` | Build a specific target (add `--config <mode>` for MSVC) |
-| `cmake --build <build_dir> --verbose` | Build with verbose output (add `--config <mode>` for MSVC) |
+## Limitations
 
-### Opening in an IDE
+- Compatibility evidence applies only to explicitly tested combinations.
+- x86-64 is supported; ARM64 is not currently supported.
+- The ImGui GUI and live GUI tools are compiled out.
+- Keyboard and mouse hooks are unavailable in the headless target.
+- UVTD and PDB-based tooling are unavailable.
+- Native loading uses `LD_PRELOAD`; there is no ptrace/attach injector.
+- Linux crash handling produces signal backtraces rather than Windows minidumps.
+- UE4SS and native mods must not be unloaded with `dlclose`.
+- Stop the host process to unload the loader.
+- Existing third-party Linux mod compatibility remains unvalidated.
+- Pinned dependency revisions are not yet guaranteed to be reachable through
+  stable public submodule remotes.
 
-#### Visual Studio
+## Documentation
 
-CMake has built-in support for generating Visual Studio solutions:
+- [Native Linux build, staging, launch, and diagnostics](docs/linux.md)
+- [Compatibility matrix](docs/linux/COMPATIBILITY.md)
+- [Source provenance](docs/linux/PROVENANCE.md)
+- [Validation fixtures and recorded results](validation/)
+- [Single-process native C++ loading result](validation/native/cpp-mod-loading/RESULT-PALWORLD-24181105.md)
+- [Repeated native C++ loading result](validation/runtime/repeated-native-cpp-mod-loading/RESULT-PALWORLD-24181105.md)
+- [Repeated loader startup and shutdown result](validation/runtime/repeated-startup-shutdown/RESULT-PALWORLD-24181105.md)
 
-```bash
-cmake -B build -G "Visual Studio 17 2022"
-```
+## Source provenance
 
-Then open the generated `.sln` file in the `build` directory.
+This repository derives from:
 
-Alternatively, Visual Studio 2022 has native CMake support - you can open the folder directly in Visual Studio and it will automatically detect the CMakeLists.txt file.
+- `UE4SS-RE/RE-UE4SS`, the official upstream project
+- `tc-imba/RE-UE4SS`, branch `linux-port`
 
-#### CLion / Other CMake IDEs
+The imported Linux baseline is preserved as:
 
-Most modern IDEs (CLion, Visual Studio Code with CMake Tools, etc.) have native CMake support. Simply open the project folder and the IDE will automatically detect and configure the CMake project.
+    Commit: 407d14cf3c485a150cd157fd581643c901dd9b0e
+    Tag:    tc-imba-linux-port-baseline-407d14c
 
-Note that you should also commit & push the submodules that you've updated if the reason why you updated was not because someone else pushed an update, and you're just catching up to it.
+The complete provenance record is available in
+[`docs/linux/PROVENANCE.md`](docs/linux/PROVENANCE.md).
 
-### Cross-Compiling Windows Binaries on Linux
+Portable fixes may be proposed upstream separately as small, independently
+reviewable changes.
 
-UE4SS supports cross-compilation from Linux to Windows using two approaches: **xwin** (recommended) or **msvc-wine**.
+## Contributing
 
-#### Prerequisites for All Cross-Compilation
+Changes should be narrowly scoped, reviewable, and accompanied by appropriate
+build or runtime validation.
 
-- [Rust toolchain >= 1.73.0](https://www.rust-lang.org/tools/install) with the `x86_64-pc-windows-msvc` target:
-  ```bash
-  rustup target add x86_64-pc-windows-msvc
-  ```
-- [CMake >= 3.22](https://cmake.org/download/)
-- [Ninja build system](https://ninja-build.org/)
+Linux runtime changes should document:
 
-#### Option 1: Cross-Compiling with xwin (Recommended)
+- the tested game and engine version;
+- the loader and executable identities;
+- the exact acceptance criteria;
+- any crash or SELinux audit result;
+- whether the change affects Lua, native C++, or process lifecycle behavior.
 
-**xwin** downloads and packages the Microsoft CRT headers/libraries and Windows SDK headers/libraries needed for cross-compilation, without requiring a Windows installation.
+Do not commit proprietary game binaries, generated runtime artifacts, crash
+archives, or private dependency credentials.
 
-##### Prerequisites
+## License
 
-- LLVM/Clang with Windows target support:
-  ```bash
-  # On Ubuntu/Debian
-  sudo apt install clang lld llvm
+This downstream retains the repository's existing license and upstream
+copyright notices.
 
-  # On Arch Linux
-  sudo pacman -S clang lld llvm
-  ```
-- [xwin](https://github.com/Jake-Shadle/xwin):
-  ```bash
-  cargo install xwin
-  ```
-
-##### Setup
-
-1. Download the Microsoft tools and SDK using xwin (this only needs to be done once):
-   ```bash
-   xwin --accept-license splat --output ~/.xwin
-   ```
-   This will download approximately 300MB and can take a few minutes.
-
-2. Set the XWIN_DIR environment variable:
-   ```bash
-   export XWIN_DIR=~/.xwin
-   ```
-
-##### Building Manually with CMake
-
-```bash
-# Configure with xwin-clang-cl toolchain (uses clang with MSVC-compatible flags)
-XWIN_DIR=~/.xwin cmake -B build_xwin \
-  -G Ninja \
-  -DCMAKE_BUILD_TYPE=Game__Shipping__Win64 \
-  -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/xwin-clang-cl-toolchain.cmake
-
-# Or use xwin-clang toolchain (uses clang with GNU-style flags)
-XWIN_DIR=~/.xwin cmake -B build_xwin \
-  -G Ninja \
-  -DCMAKE_BUILD_TYPE=Game__Shipping__Win64 \
-  -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/xwin-clang-toolchain.cmake
-
-# Build
-cmake --build build_xwin
-```
-
-##### Building with build.sh Script
-
-```bash
-# Set XWIN_DIR
-export XWIN_DIR=~/.xwin
-
-# Build with xwin-clang-cl
-./tools/buildscripts/build.sh --toolchain xwin-clang-cl
-
-# Or build with xwin-clang
-./tools/buildscripts/build.sh --toolchain xwin-clang
-
-# Build specific configuration
-./tools/buildscripts/build.sh --toolchain xwin-clang-cl --build-config Game__Debug__Win64
-
-# Clean build with verbose output
-./tools/buildscripts/build.sh --toolchain xwin-clang-cl --clean --verbose
-```
-
-#### Option 2: Cross-Compiling with msvc-wine
-
-**msvc-wine** uses actual MSVC tools running under Wine. This provides maximum compatibility but requires more setup.
-
-##### Prerequisites
-
-- Wine:
-  ```bash
-  # On Ubuntu/Debian
-  sudo apt install wine wine64 winbind
-
-  # On Arch Linux
-  sudo pacman -S wine samba
-  ```
-- [msvc-wine](https://github.com/mstorsjo/msvc-wine) - Follow their installation guide to install MSVC tools
-- Clang (for wine-clang-cl mode) or use MSVC's cl.exe (for wine-msvc mode)
-
-##### Setup
-
-1. Install msvc-wine following the [official instructions](https://github.com/mstorsjo/msvc-wine#installation).
-   By default, this installs to `~/my_msvc/opt/msvc`.
-
-2. Make sure the msvc-wine tools are in your PATH:
-   ```bash
-   export PATH="$HOME/my_msvc/opt/msvc/bin/x64:$PATH"
-   ```
-
-3. Set the Wine prefix (optional):
-   ```bash
-   export WINE_PREFIX=~/.wine
-   ```
-
-##### Building Manually with CMake
-
-```bash
-# Configure with wine-clang-cl toolchain (clang-cl under wine)
-cmake -B build_wine \
-  -G Ninja \
-  -DCMAKE_BUILD_TYPE=Game__Shipping__Win64 \
-  -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/wine-clang-cl-toolchain.cmake
-
-# Or use wine-msvc toolchain (MSVC cl.exe under wine)
-cmake -B build_wine \
-  -G Ninja \
-  -DCMAKE_BUILD_TYPE=Game__Shipping__Win64 \
-  -DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/wine-msvc-toolchain.cmake
-
-# Build
-cmake --build build_wine
-```
-
-##### Building with build.sh Script
-
-```bash
-# Build with wine-clang-cl
-./tools/buildscripts/build.sh --toolchain wine-clang-cl
-
-# Or build with wine-msvc
-./tools/buildscripts/build.sh --toolchain wine-msvc
-
-# Build specific configuration
-./tools/buildscripts/build.sh --toolchain wine-clang-cl --build-config Game__Debug__Win64
-```
-
-#### Build Output
-
-Cross-compiled binaries will be in the build directory under `<BuildMode>/bin/`:
-```
-build_xwin_Game__Shipping__Win64/
-└── Game__Shipping__Win64/
-    └── bin/
-        ├── UE4SS.dll
-        ├── dwmapi.dll  (proxy DLL)
-        └── ... (other files)
-```
-
-### Debugging Under Wine
-
-When using wine-based toolchains, you can debug crashes and issues using Wine's debugger.
-
-#### Using winedbg
-
-```bash
-# Debug a running program
-winedbg ./path/to/game.exe
-
-# Debug a crash dump
-winedbg crash_2024_12_26_07_39_15.dmp
-```
-
-#### Important Notes for Debugging
-
-- Debug symbols (.pdb files) are **not** stored in minidump files
-- You **must** have the exact same .pdb file that corresponds to the .dll that crashed
-- The easiest way to ensure matching symbols:
-  1. Note the git commit hash when you built UE4SS
-  2. When debugging a crash, checkout that exact commit
-  3. Rebuild to generate matching .pdb files
-  4. Then debug the minidump
-
-#### Tips
-
-- Set `WINEDEBUG=-all` to reduce Wine's debug output during builds (already done by build.sh)
-- If you encounter "access denied" errors, ensure you have `winbind` or `samba` installed
-- PDB files are generated in the same directory as the DLL files
-
-## Updating git submodules
-
-If you want to update git submodules, you do so one of three ways:
-1. You can execute `git submodule update --init --recursive` to update all submodules.
-2. You can also choose to update submodules one by one, by executing `git submodule update --init --recursive deps/<first-or-third>/<Repo>`.
-    Do not use the `--remote` option unless you actually want to update to the latest commit.
-3. If you would rather pick a specific commit or branch to update a submodule to then `cd` into the submodule directory for that dependency and execute `git checkout <branch name or commit>`.
-The main dependency you might want to update from time to time is `deps/first/Unreal`.
-## Credits
-
-All contributors since the project became open source: https://github.com/UE4SS-RE/RE-UE4SS/graphs/contributors
-
-
-- **Original Creator** The original creator no longer wishes to be involved in or connected to  this project.  Please respect their wishes, and avoid using their past usernames in connection with this project.
-- [**Archengius**](https://github.com/Archengius/)
-  - UHT compatible header generator
-- **CasualGamer**
-  - Injector code & aob scanner is heavily based on his work, 90% of that code is his.
-- **SunBeam**
-  - Extra signature for function 'GetFullName' for UE4.25.
-  - Regex to check for proper signature format when loaded from ini.
-  - Lots and lots of work on signatures
-- **tomsa**
-  - const char* to vector\<int> converter
-    - tomsa: Idea & most of the code
-    - Original Creator: Nibblet support
-- **boop** / **usize**
-  - New UFunction hook method
-- [**RussellJ**](https://github.com/RussellJerome)
-  - Blueprint Modloader inspiration
-- [**Narknon**](https://github.com/narknon)
-  - Certain features and maintenance/rehosting of the project
-- **DeadMor0z**
-  - Certain features and Lua updates/maintenance
-- [**OutTheShade**](https://github.com/OutTheShade/UnrealMappingsDumper)
-  - Unreal Mappings (USMAP) Generator
-- **DmgVol**
-  - Inspiration for map dumper
-- [**Buckminsterfullerene**](https://github.com/Buckminsterfullerene02/)
-  - Rewriting the documentation, various fixes
-- **trumank**
-  - Lua bindings generator, various fixes, automation & improvements
-- **localcc**
-  - C++ API
-
-## Thanks to everyone who helped with testing
-
-- GreenHouse
-- Otis_Inf
-- SunBeam
-- Motoson
-- hooter
-- Synopis
-- Buckminsterfullerene
-
-### Supported by
-[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSource)
+See [`LICENSE`](LICENSE).
