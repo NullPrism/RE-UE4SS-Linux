@@ -75,6 +75,24 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes clang-20 lld-20 llvm-20 cmake ninja-build
 
+      - name: Put Clang 20 first in PATH
+        run: |
+          toolchain_dir="${RUNNER_TEMP}/clang-20-bin"
+
+          mkdir -p "${toolchain_dir}"
+
+          ln -sf "$(command -v clang-20)"             "${toolchain_dir}/clang"
+
+          ln -sf "$(command -v clang++-20)"             "${toolchain_dir}/clang++"
+
+          ln -sf "$(command -v clang-20)"             "${toolchain_dir}/cc"
+
+          ln -sf "$(command -v clang++-20)"             "${toolchain_dir}/c++"
+
+          ln -sf "$(command -v llvm-ar-20)"             "${toolchain_dir}/ar"
+
+          printf '%s\n' "${toolchain_dir}" >> "${GITHUB_PATH}"
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
@@ -87,8 +105,12 @@ jobs:
         run: |
           set -euxo pipefail
 
-          clang-20 --version
-          clang++-20 --version
+          command -v clang
+          readlink -f "$(command -v clang)"
+          clang --version
+          command -v clang++
+          readlink -f "$(command -v clang++)"
+          clang++ --version
           cmake --version
           xmake --version
 
@@ -102,13 +124,17 @@ jobs:
           }
           EOF
 
-          clang++-20 -std=c++23 /tmp/std-expected.cpp -o /tmp/std-expected
+          clang++ -std=c++23 /tmp/std-expected.cpp -o /tmp/std-expected
 
           /tmp/std-expected
 
       - name: Configure
+        env:
+          CC: clang
+          CXX: clang++
+          AR: ar
         run: |
-          xmake f -p linux -a x86_64 -m Game__Shipping__Linux --cc=clang-20 --cxx=clang++-20 --ld=clang++-20 --sh=clang++-20 --ar=llvm-ar-20 -y -vD
+          xmake f -p linux -a x86_64 -m Game__Shipping__Linux --cc=clang --cxx=clang++ --ld=clang++ --sh=clang++ --ar=ar -y -vD
 
       - name: Dump xmake package failure logs
         if: ${{ failure() }}
