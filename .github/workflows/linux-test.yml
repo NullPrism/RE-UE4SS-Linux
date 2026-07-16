@@ -31,7 +31,7 @@ jobs:
       - name: Install native build tools
         run: |
           sudo apt-get update
-          sudo apt-get install --yes clang lld ninja-build
+          sudo apt-get install --yes clang-20 lld-20 llvm-20 ninja-build
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -39,8 +39,8 @@ jobs:
       - name: Configure
         run: |
           cmake -S . -B build_linux_ci -G Ninja \
-            -DCMAKE_C_COMPILER=clang \
-            -DCMAKE_CXX_COMPILER=clang++ \
+            -DCMAKE_C_COMPILER=clang-20 \
+            -DCMAKE_CXX_COMPILER=clang++-20 \
             -DCMAKE_BUILD_TYPE=Game__Shipping__Linux \
             -DUE4SS_GUI=OFF \
             -DUE4SS_BUILD_TESTS=ON
@@ -73,7 +73,7 @@ jobs:
       - name: Install native build tools
         run: |
           sudo apt-get update
-          sudo apt-get install --yes clang lld cmake ninja-build
+          sudo apt-get install --yes clang-20 lld-20 llvm-20 cmake ninja-build
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -87,8 +87,8 @@ jobs:
         run: |
           set -euxo pipefail
 
-          clang --version
-          clang++ --version
+          clang-20 --version
+          clang++-20 --version
           cmake --version
           xmake --version
 
@@ -102,13 +102,13 @@ jobs:
           }
           EOF
 
-          clang++             -std=c++23             /tmp/std-expected.cpp             -o /tmp/std-expected
+          clang++-20 -std=c++23 /tmp/std-expected.cpp -o /tmp/std-expected
 
           /tmp/std-expected
 
       - name: Configure
         run: |
-          xmake f             -p linux             -a x86_64             -m Game__Shipping__Linux             -y             -vD
+          xmake f -p linux -a x86_64 -m Game__Shipping__Linux --cc=clang-20 --cxx=clang++-20 --ld=clang++-20 --sh=clang++-20 --ar=llvm-ar-20 -y -vD
 
       - name: Dump xmake package failure logs
         if: ${{ failure() }}
