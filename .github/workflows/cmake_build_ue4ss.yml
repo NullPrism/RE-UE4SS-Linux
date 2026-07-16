@@ -55,6 +55,10 @@ jobs:
         with:
           submodules: recursive
           token: ${{ secrets.UEPSEUDO_PAT }}
+
+      - name: Apply downstream UEPseudo patches
+        shell: bash
+        run: ./tools/ci/apply-uepseudo-patches.sh
           ref: ${{inputs.commit-sha}}
           fetch-depth: 0  # Need full history for git diff to work with PR base SHA
 

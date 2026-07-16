@@ -28,6 +28,9 @@ jobs:
           submodules: recursive
           token: ${{ secrets.UEPSEUDO_PAT || github.token }}
 
+      - name: Apply downstream UEPseudo patches
+        run: ./tools/ci/apply-uepseudo-patches.sh
+
       - name: Install native build tools
         run: |
           sudo apt-get update
@@ -69,6 +72,9 @@ jobs:
           fetch-depth: 0
           submodules: recursive
           token: ${{ secrets.UEPSEUDO_PAT || github.token }}
+
+      - name: Apply downstream UEPseudo patches
+        run: ./tools/ci/apply-uepseudo-patches.sh
 
       - name: Install native build tools
         run: |
