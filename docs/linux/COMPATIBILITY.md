@@ -32,7 +32,7 @@
 | Reflected property write | Pass |
 | Reflected UFunction invocation | Pass |
 | Reflected UFunction primitive parameters | Pass |
-| Hook parameter handling | Pending |
+| Hook parameter handling | Pass |
 | Repeated startup/shutdown | Pending |
 | Native C++ mod loading | Pending |
 | Existing third-party mod compatibility | Pending |

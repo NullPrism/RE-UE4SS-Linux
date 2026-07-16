@@ -1,0 +1,30 @@
+[NullPrismReflectedHookParameters] main.lua loaded
+[NullPrismReflectedHookParameters] InitGameState post-hook registered
+[NullPrismReflectedHookParameters] InitGameState post-hook fired
+[NullPrismReflectedHookParameters] GetActorTickInterval Lua type=userdata
+[NullPrismReflectedHookParameters] SetActorTickInterval Lua type=userdata
+[NullPrismReflectedHookParameters] original tick interval=1.0
+[NullPrismReflectedHookParameters] hook pre ID=1
+[NullPrismReflectedHookParameters] hook post ID=2
+[NullPrismReflectedHookParameters] invoking SetActorTickInterval with existing value=1.0
+[NullPrismReflectedHookParameters] pre-hook fired count=1
+[NullPrismReflectedHookParameters] context parameter Lua type=userdata
+[NullPrismReflectedHookParameters] context parameter wrapper type=RemoteUnrealParam
+[NullPrismReflectedHookParameters] tick interval parameter Lua type=userdata
+[NullPrismReflectedHookParameters] tick interval parameter wrapper type=RemoteUnrealParam
+[NullPrismReflectedHookParameters] hook interval Lua type=number
+[NullPrismReflectedHookParameters] hook interval value=1.0
+[NullPrismReflectedHookParameters] context matches target=true
+[NullPrismReflectedHookParameters] interval delta=0.0
+[NullPrismReflectedHookParameters] interval matches target=true
+[NullPrismReflectedHookParameters] matching pre-hook callback observed
+[NullPrismReflectedHookParameters] SetActorTickInterval invocation completed
+[NullPrismReflectedHookParameters] hook unregistered
+[NullPrismReflectedHookParameters] readback tick interval=1.0
+[NullPrismReflectedHookParameters] readback delta=0.0
+[NullPrismReflectedHookParameters] state unchanged=true
+[NullPrismReflectedHookParameters] hook callback count=1
+[NullPrismReflectedHookParameters] matching callback seen=true
+[NullPrismReflectedHookParameters] callback error seen=false
+[NullPrismReflectedHookParameters] RESULT=PASS
+[NullPrismReflectedHookParameters] test completed
