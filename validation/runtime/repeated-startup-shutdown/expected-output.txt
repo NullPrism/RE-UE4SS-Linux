@@ -1,0 +1,35 @@
+===== Cycle 1/5 =====
+Readiness state: marker=1 game_port=1 query_port=1
+Startup readiness PASS
+Graceful shutdown PASS
+Cycle 1: PASS
+
+===== Cycle 2/5 =====
+Readiness state: marker=1 game_port=1 query_port=1
+Startup readiness PASS
+Graceful shutdown PASS
+Cycle 2: PASS
+
+===== Cycle 3/5 =====
+Readiness state: marker=1 game_port=1 query_port=1
+Startup readiness PASS
+Graceful shutdown PASS
+Cycle 3: PASS
+
+===== Cycle 4/5 =====
+Readiness state: marker=1 game_port=1 query_port=1
+Startup readiness PASS
+Graceful shutdown PASS
+Cycle 4: PASS
+
+===== Cycle 5/5 =====
+Readiness state: marker=1 game_port=1 query_port=1
+Startup readiness PASS
+Graceful shutdown PASS
+Cycle 5: PASS
+
+=== Final result ===
+RequestedCycles=5
+PassedCycles=5
+FailedCycles=0
+RESULT=PASS
