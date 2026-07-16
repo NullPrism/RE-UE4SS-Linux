@@ -25,9 +25,9 @@ version, Linux distribution, or existing third-party mod.
 Production deployment is not yet recommended until broader game and
 third-party-mod compatibility has been established.
 
-Public source builds also currently depend on access to the pinned UEPseudo
-submodule revision. Dependency availability and reproducible public source
-bootstrapping remain active project concerns.
+Source builds require authorized access to the pinned UEPseudo submodule.
+The patternsleuth submodule is public and uses HTTPS, but an anonymous
+recursive clone cannot complete without UEPseudo authorization.
 
 ## Validated target
 
@@ -100,6 +100,29 @@ The current Linux build requires:
 - Access to all pinned Git submodules
 
 GCC is not a supported compiler for this downstream.
+
+### Submodule access
+
+The repository contains two pinned submodules:
+
+- `deps/first/Unreal` is UEPseudo and requires authorized GitHub access.
+- `deps/first/patternsleuth` is public and uses HTTPS.
+
+Verify UEPseudo access before initializing the complete source tree:
+
+    GIT_TERMINAL_PROMPT=0 \
+      git ls-remote \
+        git@github.com:Re-UE4SS/UEPseudo.git \
+        HEAD
+
+Then synchronize and initialize the pinned revisions:
+
+    git submodule sync --recursive
+    git submodule update --init --recursive
+
+An anonymous recursive clone is expected to stop at UEPseudo. This is an
+access requirement of that dependency rather than a missing commit or broken
+gitlink in this downstream.
 
 Detailed prerequisites, build commands, staging instructions, and diagnostics
 are documented in the [native Linux guide](docs/linux.md).

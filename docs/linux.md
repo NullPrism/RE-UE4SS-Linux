@@ -41,13 +41,28 @@ strings "$(clang++ -print-file-name=libstdc++.so.6)" \
 
 The second command must print `GLIBCXX_3.4.32` or a later version. A binary built on a newer distribution can acquire newer ABI requirements, so release artifacts should be produced in the project's baseline build environment.
 
-Clone all submodules before configuring:
+The repository contains two pinned submodules:
+
+- `deps/first/Unreal` is UEPseudo and requires authorized GitHub access.
+- `deps/first/patternsleuth` is public and uses HTTPS.
+
+Verify UEPseudo access before initializing the complete source tree:
 
 ```bash
+GIT_TERMINAL_PROMPT=0 \
+  git ls-remote \
+    git@github.com:Re-UE4SS/UEPseudo.git \
+    HEAD
+```
+
+Then synchronize and initialize the exact pinned revisions:
+
+```bash
+git submodule sync --recursive
 git submodule update --init --recursive
 ```
 
-The current source tree includes a pinned UEPseudo dependency that may require authorized repository access. Public source bootstrapping is not guaranteed until all pinned dependency revisions are available through stable public remotes.
+An anonymous recursive clone is expected to stop at UEPseudo. That failure does not indicate that the pinned commit is missing; it means the GitHub identity performing the clone is not authorized for that repository.
 
 ## Build with CMake
 
