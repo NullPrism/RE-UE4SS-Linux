@@ -31,6 +31,7 @@
 | Reflected numeric property read | Pass |
 | Reflected property write | Pass |
 | Reflected UFunction invocation | Pass |
+| Reflected UFunction primitive parameters | Pass |
 | Hook parameter handling | Pending |
 | Repeated startup/shutdown | Pending |
 | Native C++ mod loading | Pending |
