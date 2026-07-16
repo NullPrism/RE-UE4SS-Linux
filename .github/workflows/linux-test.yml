@@ -132,9 +132,9 @@ jobs:
         env:
           CC: clang
           CXX: clang++
-          AR: ar
+          AR: /usr/bin/llvm-ar-20
         run: |
-          xmake f -p linux -a x86_64 -m Game__Shipping__Linux --cc=clang --cxx=clang++ --ld=clang++ --sh=clang++ --ar=ar -y -vD
+          xmake f -p linux -a x86_64 -m Game__Shipping__Linux --cc=clang --cxx=clang++ --ld=clang++ --sh=clang++ --ar=/usr/bin/llvm-ar-20 -y -vD
 
       - name: Dump xmake package failure logs
         if: ${{ failure() }}
