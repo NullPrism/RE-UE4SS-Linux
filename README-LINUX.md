@@ -21,6 +21,7 @@ Experimental. This project is not yet recommended for production servers.
 - Read-only reflected UFunction lookup, invocation, and primitive return conversion
 - Primitive reflected UFunction input-parameter marshalling
 - Reflected pre-hook context and primitive-parameter handling
+- Repeated fresh-process startup and graceful-shutdown stability
 - Scoped SELinux operation without global `execheap`
 
 ## Scope
