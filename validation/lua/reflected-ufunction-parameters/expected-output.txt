@@ -1,0 +1,17 @@
+[NullPrismReflectedUFunctionParameters] main.lua loaded
+[NullPrismReflectedUFunctionParameters] InitGameState post-hook registered
+[NullPrismReflectedUFunctionParameters] InitGameState post-hook fired
+[NullPrismReflectedUFunctionParameters] KismetMathLibrary IsValid=true
+[NullPrismReflectedUFunctionParameters] KismetMathLibrary full name=KismetMathLibrary /Script/Engine.Default__KismetMathLibrary
+[NullPrismReflectedUFunctionParameters] Add_IntInt Lua type=userdata
+[NullPrismReflectedUFunctionParameters] Add_IntInt userdata IsValid=true
+[NullPrismReflectedUFunctionParameters] Add_IntInt full name=Function /Script/Engine.KismetMathLibrary:Add_IntInt
+[NullPrismReflectedUFunctionParameters] left argument=20
+[NullPrismReflectedUFunctionParameters] right argument=22
+[NullPrismReflectedUFunctionParameters] expected result=42
+[NullPrismReflectedUFunctionParameters] invocation completed
+[NullPrismReflectedUFunctionParameters] return Lua type=number
+[NullPrismReflectedUFunctionParameters] return value=42
+[NullPrismReflectedUFunctionParameters] result verified=true
+[NullPrismReflectedUFunctionParameters] RESULT=PASS
+[NullPrismReflectedUFunctionParameters] test completed

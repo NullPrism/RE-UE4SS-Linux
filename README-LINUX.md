@@ -19,6 +19,7 @@ Experimental. This project is not yet recommended for production servers.
 - Reflected primitive numeric property reads
 - Controlled reflected numeric property write, readback, and restoration
 - Read-only reflected UFunction lookup, invocation, and primitive return conversion
+- Primitive reflected UFunction input-parameter marshalling
 - Scoped SELinux operation without global `execheap`
 
 ## Scope
