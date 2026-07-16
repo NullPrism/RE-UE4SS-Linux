@@ -35,6 +35,7 @@
 | Hook parameter handling | Pass |
 | Repeated startup/shutdown | Pass |
 | Native C++ mod loading | Pass |
+| Repeated native C++ mod loading | Pass |
 | Existing third-party mod compatibility | Pending |
 
 ## Limitations
