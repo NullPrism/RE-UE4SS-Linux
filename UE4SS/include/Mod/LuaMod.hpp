@@ -196,7 +196,15 @@ namespace RC
       private:
         auto start_async_thread() -> void
         {
+#ifdef __linux__
+            // Native Linux currently disables the per-mod asynchronous worker
+            // because its shutdown path can intermittently terminate the host
+            // process. Lua features that depend on update_async are unavailable
+            // until the thread lifecycle is made safe on Linux.
+            return;
+#else
             m_async_thread = std::jthread{&Mod::update_async, this};
+#endif
         }
 
       private:
