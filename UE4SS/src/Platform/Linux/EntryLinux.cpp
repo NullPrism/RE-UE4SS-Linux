@@ -148,6 +148,15 @@ __attribute__((constructor(101))) static void ue4ss_so_attached()
     }
 
     const auto startup_decision = LinuxStartup::evaluate();
+    if (startup_decision.kind == LinuxStartup::DecisionKind::MissingTarget)
+    {
+        if (LinuxDiagnostics::is_enabled())
+        {
+            std::fprintf(stderr, "DIAG: startup_skipped reason=missing_target\n");
+        }
+        return;
+    }
+
     if (startup_decision.kind == LinuxStartup::DecisionKind::TargetMismatch)
     {
         if (LinuxDiagnostics::is_enabled())

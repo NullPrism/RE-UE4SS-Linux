@@ -146,7 +146,7 @@ Linux passes `LD_PRELOAD` through the process environment, so an ordinary preloa
 
 Windows does not need this policy: proxy DLL and manual DLL injection load UE4SS into one selected process, and loaded modules are not inherited by child processes.
 
-Setting `LD_PRELOAD` manually remains compatible, but it retains normal Linux child inheritance and is not process-scoped. Use `run_ue4ss.sh` for the supported scoped workflow. If the user's original `LD_PRELOAD` already contains UE4SS, exact preservation takes precedence and descendants may still load that user-supplied entry.
+Marker-free manual `LD_PRELOAD` and explicit `dlopen` do not auto-start UE4SS by default. Use `run_ue4ss.sh` for the supported process-scoped workflow. Deliberate legacy compatibility can be enabled with `UE4SS_ALLOW_LEGACY_START=1`, but that mode retains normal Linux child inheritance and may initialize UE4SS in descendant or helper processes. If the user's original `LD_PRELOAD` already contains UE4SS, exact preservation takes precedence.
 
 ## Diagnostics and logs
 

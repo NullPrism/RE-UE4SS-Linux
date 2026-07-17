@@ -21,6 +21,7 @@ namespace
             std::string_view{RC::LinuxStartup::OriginalPreloadWasSetEnv},
             std::string_view{RC::LinuxStartup::OriginalPreloadEnv},
             std::string_view{RC::LinuxStartup::ModulePathEnv},
+            std::string_view{RC::LinuxStartup::LegacyStartEnv},
     };
 
     class EnvironmentSnapshot
@@ -132,11 +133,26 @@ int main(int argc, char** argv)
         std::filesystem::copy_file(self, other_path);
 
         clear_environment();
-        expect(RC::LinuxStartup::evaluate(self).kind == RC::LinuxStartup::DecisionKind::LegacyStart,
-               "marker-free startup was not legacy");
-
-        set_environment(RC::LinuxStartup::TargetExecutableEnv, "");
         auto decision = RC::LinuxStartup::evaluate(self);
+        expect(decision.kind == RC::LinuxStartup::DecisionKind::MissingTarget &&
+                       decision.reason == "missing_target",
+               "marker-free startup did not fail closed");
+
+        set_environment(RC::LinuxStartup::LegacyStartEnv, "0");
+        decision = RC::LinuxStartup::evaluate(self);
+        expect(decision.kind == RC::LinuxStartup::DecisionKind::MissingTarget &&
+                       decision.reason == "missing_target",
+               "disabled legacy startup did not fail closed");
+
+        set_environment(RC::LinuxStartup::LegacyStartEnv, "1");
+        decision = RC::LinuxStartup::evaluate(self);
+        expect(decision.kind == RC::LinuxStartup::DecisionKind::LegacyStart &&
+                       decision.reason == "legacy_start_opt_in",
+               "explicit legacy startup was not accepted");
+
+        clear_environment();
+        set_environment(RC::LinuxStartup::TargetExecutableEnv, "");
+        decision = RC::LinuxStartup::evaluate(self);
         expect(decision.kind == RC::LinuxStartup::DecisionKind::InvalidLauncherState && decision.reason == "empty_target",
                "empty target was not rejected");
 

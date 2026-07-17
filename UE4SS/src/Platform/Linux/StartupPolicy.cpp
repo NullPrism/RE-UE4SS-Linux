@@ -13,7 +13,19 @@ namespace RC::LinuxStartup
         const auto* expected_value = std::getenv(TargetExecutableEnv);
         if (!expected_value)
         {
-            return {.kind = DecisionKind::LegacyStart};
+            const auto* legacy_start = std::getenv(LegacyStartEnv);
+            if (legacy_start && std::strcmp(legacy_start, "1") == 0)
+            {
+                return {
+                        .kind = DecisionKind::LegacyStart,
+                        .reason = "legacy_start_opt_in",
+                };
+            }
+
+            return {
+                    .kind = DecisionKind::MissingTarget,
+                    .reason = "missing_target",
+            };
         }
         if (expected_value[0] == '\0')
         {

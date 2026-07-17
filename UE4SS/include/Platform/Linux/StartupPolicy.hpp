@@ -12,9 +12,11 @@ namespace RC::LinuxStartup
     inline constexpr char OriginalPreloadWasSetEnv[] = "UE4SS_LAUNCH_LD_PRELOAD_WAS_SET";
     inline constexpr char OriginalPreloadEnv[] = "UE4SS_LAUNCH_ORIGINAL_LD_PRELOAD";
     inline constexpr char ModulePathEnv[] = "UE4SS_MODULE_PATH";
+    inline constexpr char LegacyStartEnv[] = "UE4SS_ALLOW_LEGACY_START";
 
     enum class DecisionKind
     {
+        MissingTarget,
         LegacyStart,
         LauncherStart,
         TargetMismatch,
