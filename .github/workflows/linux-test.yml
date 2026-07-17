@@ -100,7 +100,7 @@ jobs:
             "${output_dir}/RE-UE4SS-Linux-${package_version}-x86_64-debug.tar.gz"
 
       - name: Upload Linux runtime packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: RE-UE4SS-Linux-x86_64-${{ github.sha }}
           path: |
