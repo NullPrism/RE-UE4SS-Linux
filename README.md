@@ -301,6 +301,18 @@ The complete provenance record is available in
 Portable fixes may be proposed upstream separately as small, independently
 reviewable changes.
 
+## Community and support
+
+For installation help, compatibility discussion, testing coordination, and
+general project questions, join the
+[Null Prism Discord community](https://discord.gg/CC4psCt2y5).
+
+Use [GitHub Issues](https://github.com/NullPrism/RE-UE4SS-Linux/issues/new/choose) for reproducible loader bugs and
+compatibility reports that should be tracked publicly.
+
+Community support is provided on a best-effort basis. This project is not
+affiliated with or supported by the official UE4SS project or Pocketpair.
+
 ## Contributing
 
 Changes should be narrowly scoped, reviewable, and accompanied by appropriate
