@@ -115,8 +115,9 @@ Thanks to [OutTheShade](https://github.com/OutTheShade/UnrealMappingsDumper) for
 
 Dump all loaded actors to the file `ue4ss_static_mesh_data.csv` to generate `.umaps` in-editor. 
 
-Two prerequisites are required to load the dumped actors in-editor to reconstruct the `.umap`:
-- All dumped actors (static meshes, their materials/textures) must be reconstructed in the editor
-- Download `zMapGenBP.zip` from the Releases page and follow the instructions in the Readme file inside of it
+Reconstructing the resulting `.umap` still requires the dumped actors, meshes,
+materials, and textures to be recreated in Unreal Editor. The editor-side
+reconstruction assets previously bundled upstream are not distributed by this
+Linux downstream.
 
 The keybind to dump mappings is by default `Ctrl` + `Numpad 7`, and can be changed in `Mods/Keybinds/Scripts/main.lua`.
