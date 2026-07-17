@@ -76,6 +76,9 @@ See the [Linux release policy](docs/linux/RELEASES.md), the
 and the
 [published release](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.0).
 
+For end-user installation from the published runtime archive, follow the
+[`linux-v0.1.0` runtime installation guide](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.0/packaging/linux/INSTALL.md).
+
 ## Validated functionality
 
 The following capabilities have passed live testing on the validated target:
@@ -269,6 +272,7 @@ reclaimed the module when the host process terminated.
 
 ## Documentation
 
+- [`linux-v0.1.0` runtime installation guide](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.0/packaging/linux/INSTALL.md)
 - [Native Linux build, staging, launch, and diagnostics](docs/linux.md)
 - [Compatibility matrix](docs/linux/COMPATIBILITY.md)
 - [Source provenance](docs/linux/PROVENANCE.md)
