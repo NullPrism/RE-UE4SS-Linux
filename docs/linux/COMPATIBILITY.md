@@ -11,8 +11,8 @@
 | Architecture | x86-64 |
 | Distribution | Fedora Linux 43 |
 | Imported Linux baseline | `407d14cf3c485a150cd157fd581643c901dd9b0e` |
-| Runtime acceptance source | `0b1c7f90a35fb2f35baf545548ea641f74418ba1` |
-| Runtime-accepted packaged loader SHA-256 | `32d903487643ec91b0fadc0f6564a2ea4064b55096ba7677d96263d01f263ba7` |
+| Runtime acceptance source | `linux-v0.1.0` release tag; exact commit recorded in `RELEASE-MANIFEST.txt` |
+| Runtime-accepted packaged loader identity | See `RELEASE-MANIFEST.txt` and `BUILD-METADATA.txt` |
 | PalServer SHA-256 | `788649fa1592160faa7bcf07ccd16d474ebeaae954717bc32284b5a43028d8e7` |
 | PalServer ELF build ID | `7f7e167407984ec3` |
 | Loader artifact | `libUE4SS.so` |
@@ -38,7 +38,7 @@
 | Reflected UFunction primitive parameters | Pass |
 | Hook parameter handling | Pass |
 | Repeated startup/shutdown | Pass |
-| Packaged-runtime five-cycle acceptance | Pass |
+| Final release acceptance matrix (36 cycles) | Pass |
 | Native C++ mod loading | Pass |
 | Repeated native C++ mod loading | Pass |
 | Existing third-party mod compatibility | Pending |
