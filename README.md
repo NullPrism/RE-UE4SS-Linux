@@ -44,6 +44,21 @@ recursive clone cannot complete without UEPseudo authorization.
 
 See the complete [Linux compatibility matrix](docs/linux/COMPATIBILITY.md).
 
+
+## Releases
+
+Downstream native Linux releases use the tag format
+`linux-vMAJOR.MINOR.PATCH`. This avoids ambiguity with the inherited upstream
+UE4SS tags retained in the repository.
+
+The first planned release is the `linux-v0.1.0` GitHub prerelease. Release
+assets are built from an explicitly pinned source commit and published only
+after independent package and runtime validation.
+
+See the [Linux release policy](docs/linux/RELEASES.md) and the
+[RE-UE4SS Linux v0.1.0 prerelease notes](docs/linux/RELEASE-NOTES-v0.1.0.md).
+
+
 ## Validated functionality
 
 The following capabilities have passed live testing on the validated target:

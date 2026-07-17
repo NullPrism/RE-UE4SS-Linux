@@ -1,0 +1,235 @@
+name: Linux Release Candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Package version without the linux-v prefix
+        required: true
+        default: 0.1.0
+        type: string
+      source_commit:
+        description: Exact 40-character commit on main to build
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: linux-release-candidate-${{ inputs.version }}-${{ inputs.source_commit }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and verify Linux release candidate
+    runs-on: ubuntu-24.04
+
+    env:
+      RELEASE_VERSION: ${{ inputs.version }}
+      SOURCE_COMMIT: ${{ inputs.source_commit }}
+
+    steps:
+      - name: Validate release identity
+        id: identity
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "ERROR: invalid release version: $RELEASE_VERSION" >&2
+              exit 1
+          fi
+
+          if [[ ! "$SOURCE_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
+              echo "ERROR: source commit must be a full lowercase SHA-1." >&2
+              exit 1
+          fi
+
+          printf 'version=%s\n' \
+              "$RELEASE_VERSION" \
+              >> "$GITHUB_OUTPUT"
+
+          printf 'source_commit=%s\n' \
+              "$SOURCE_COMMIT" \
+              >> "$GITHUB_OUTPUT"
+
+          printf 'source_short=%s\n' \
+              "${SOURCE_COMMIT:0:12}" \
+              >> "$GITHUB_OUTPUT"
+
+      - name: Checkout validated source
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.identity.outputs.source_commit }}
+          fetch-depth: 0
+          submodules: recursive
+          token: ${{ secrets.UEPSEUDO_PAT || github.token }}
+
+      - name: Verify checked-out source
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          actual_commit="$(git rev-parse HEAD)"
+
+          if [[ "$actual_commit" != "$SOURCE_COMMIT" ]]; then
+              echo "ERROR: checked-out source does not match request." >&2
+              echo "Expected: $SOURCE_COMMIT" >&2
+              echo "Actual:   $actual_commit" >&2
+              exit 1
+          fi
+
+          git fetch --no-tags origin main
+
+          if ! git merge-base --is-ancestor \
+              "$SOURCE_COMMIT" \
+              origin/main; then
+
+              echo "ERROR: source commit is not reachable from origin/main." >&2
+              exit 1
+          fi
+
+          git status --short --branch
+          git log -1 --oneline --decorate
+
+      - name: Apply downstream UEPseudo patches
+        run: ./tools/ci/apply-uepseudo-patches.sh
+
+      - name: Install native build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+              clang-20 \
+              lld-20 \
+              llvm-20 \
+              ninja-build \
+              file \
+              binutils \
+              gzip
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Configure
+        run: |
+          cmake -S . -B build_linux_release -G Ninja \
+              -DCMAKE_C_COMPILER=clang-20 \
+              -DCMAKE_CXX_COMPILER=clang++-20 \
+              -DCMAKE_BUILD_TYPE=Game__Shipping__Linux \
+              -DUE4SS_GUI=OFF \
+              -DUE4SS_BUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build_linux_release --parallel 2
+
+      - name: Check unresolved dynamic symbols
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          loader="build_linux_release/Game__Shipping__Linux/lib/libUE4SS.so"
+
+          relocation_status=0
+
+          relocation_output="$(
+              ldd -r "$loader" 2>&1
+          )" || relocation_status=$?
+
+          printf '%s\n' "$relocation_output"
+
+          if (( relocation_status != 0 )) ||
+             grep -Eqi \
+                 'undefined symbol|not found' \
+                 <<< "$relocation_output"; then
+
+              echo "ERROR: loader relocation validation failed." >&2
+              exit 1
+          fi
+
+      - name: Test
+        run: |
+          ctest \
+              --test-dir build_linux_release \
+              --output-on-failure
+
+      - name: Package Linux release candidate
+        id: package
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          output_dir="${GITHUB_WORKSPACE}/dist/linux-release"
+          loader="${GITHUB_WORKSPACE}/build_linux_release/Game__Shipping__Linux/lib/libUE4SS.so"
+
+          tools/release/package-linux-runtime.sh \
+              --loader "$loader" \
+              --version "$RELEASE_VERSION" \
+              --output-dir "$output_dir" \
+              --source-commit "$SOURCE_COMMIT" \
+              --loader-source-commit "$SOURCE_COMMIT"
+
+          printf 'output_dir=%s\n' \
+              "$output_dir" \
+              >> "$GITHUB_OUTPUT"
+
+      - name: Verify Linux release candidate
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          output_dir="${{ steps.package.outputs.output_dir }}"
+
+          runtime_archive="${output_dir}/RE-UE4SS-Linux-${RELEASE_VERSION}-x86_64.tar.gz"
+          debug_archive="${output_dir}/RE-UE4SS-Linux-${RELEASE_VERSION}-x86_64-debug.tar.gz"
+
+          tools/ci/verify-linux-runtime-package.sh \
+              "$runtime_archive" \
+              "$debug_archive"
+
+      - name: Create release manifest
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          output_dir="${{ steps.package.outputs.output_dir }}"
+          runtime_archive="${output_dir}/RE-UE4SS-Linux-${RELEASE_VERSION}-x86_64.tar.gz"
+          debug_archive="${output_dir}/RE-UE4SS-Linux-${RELEASE_VERSION}-x86_64-debug.tar.gz"
+          runtime_root="RE-UE4SS-Linux-${RELEASE_VERSION}-x86_64"
+          manifest="${output_dir}/RELEASE-MANIFEST.txt"
+
+          {
+              echo "ReleaseTag=linux-v${RELEASE_VERSION}"
+              echo "PackageVersion=${RELEASE_VERSION}"
+              echo "SourceCommit=${SOURCE_COMMIT}"
+              echo "WorkflowRunID=${GITHUB_RUN_ID}"
+              echo "WorkflowRunAttempt=${GITHUB_RUN_ATTEMPT}"
+              echo
+              echo "[ArchiveSHA256]"
+              (
+                  cd "$output_dir"
+
+                  sha256sum \
+                      "$(basename "$runtime_archive")" \
+                      "$(basename "$debug_archive")"
+              )
+              echo
+              echo "[BuildMetadata]"
+              tar \
+                  -xOzf "$runtime_archive" \
+                  "${runtime_root}/BUILD-METADATA.txt"
+          } > "$manifest"
+
+          cat "$manifest"
+
+      - name: Upload Linux release candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: RE-UE4SS-Linux-${{ steps.identity.outputs.version }}-x86_64-${{ steps.identity.outputs.source_short }}
+          path: |
+            ${{ steps.package.outputs.output_dir }}/*.tar.gz
+            ${{ steps.package.outputs.output_dir }}/*.sha256
+            ${{ steps.package.outputs.output_dir }}/RELEASE-MANIFEST.txt
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0
