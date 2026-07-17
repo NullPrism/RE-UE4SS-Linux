@@ -1,1 +1,6 @@
 blank_issues_enabled: false
+
+contact_links:
+  - name: Null Prism Discord community
+    url: https://discord.gg/CC4psCt2y5
+    about: Ask installation questions, discuss compatibility, and coordinate testing.
