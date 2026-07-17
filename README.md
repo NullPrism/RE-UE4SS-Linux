@@ -304,11 +304,13 @@ reviewable changes.
 ## Community and support
 
 For installation help, compatibility discussion, testing coordination, and
-general project questions, join the
-[Null Prism Discord community](https://discord.gg/CC4psCt2y5).
+general project questions, join the Null Prism Discord community:
 
-Use [GitHub Issues](https://github.com/NullPrism/RE-UE4SS-Linux/issues/new/choose) for reproducible loader bugs and
-compatibility reports that should be tracked publicly.
+[![Join the Null Prism Discord](https://img.shields.io/badge/Join%20the%20Null%20Prism%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/CC4psCt2y5)
+
+Use [GitHub Issues](https://github.com/NullPrism/RE-UE4SS-Linux/issues/new/choose)
+for reproducible loader bugs and compatibility reports that should be tracked
+publicly.
 
 Community support is provided on a best-effort basis. This project is not
 affiliated with or supported by the official UE4SS project or Pocketpair.
