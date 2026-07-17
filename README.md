@@ -1,3 +1,5 @@
+[![Join the Null Prism Discord](https://img.shields.io/badge/Join%20the%20Null%20Prism%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/CC4psCt2y5)
+
 # RE-UE4SS Linux
 
 [![Native Linux](https://github.com/NullPrism/RE-UE4SS-Linux/actions/workflows/linux-test.yml/badge.svg?branch=main)](https://github.com/NullPrism/RE-UE4SS-Linux/actions/workflows/linux-test.yml)
