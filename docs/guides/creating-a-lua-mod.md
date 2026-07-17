@@ -2,7 +2,7 @@
 
 ## Before you start
 To create a Lua mod in UE4SS, you should first: 
-* know [how to install UE4SS](../installation-guide.md) in your target game and make sure it is running OK;
+* know [how to install the native Linux loader](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.0/packaging/linux/INSTALL.md) in your target game and make sure it is running OK;
 * be able to write basic Lua code (see the official book [Programming in Lua](https://www.lua.org/pil/contents.html) and its later editions, or any other recommended tutorial online);
 * have an understanding of the object model of the Unreal Engine and the basics of game modding.
 
