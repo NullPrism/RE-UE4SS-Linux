@@ -56,9 +56,6 @@ on_install(function(target) end)
 
 includes("deps")
 includes("UE4SS")
-if is_plat("windows") and get_config("ue4ssCross") ~= "msvc-wine" then
-    includes("UVTD")
-end
 if is_plat("windows") then
     includes("cppmods")
 end
