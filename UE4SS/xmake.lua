@@ -1,7 +1,3 @@
-if is_plat("windows") and get_config("ue4ssCross") ~= "msvc-wine" then
-    includes("proxy_generator")
-end
-
 if is_plat("windows") then
     add_requires("imgui v1.92.1", { debug = is_mode_debug(), configs = { win32 = true, dx11 = true, opengl3 = true, glfw_opengl3 = true , runtimes = get_mode_runtimes()} } )
     add_requires("ImGuiTextEdit v1.2.0", { debug = is_mode_debug(), configs = {runtimes = get_mode_runtimes()} })

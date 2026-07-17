@@ -3,11 +3,6 @@ project(UE4SS)
 
 message("Configuring UE4SS")
 
-# Add proxy generator subproject (generates Windows proxy DLLs; PE-format specific)
-if(WIN32)
-    add_subdirectory("proxy_generator")
-endif()
-
 # Release settings
 option(UE4SS_LIB_BETA_IS_STARTED "Have beta releases started for the current major version" ON)
 option(UE4SS_LIB_IS_BETA "Is this a beta release" ON)
