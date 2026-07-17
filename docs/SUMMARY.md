@@ -1,7 +1,7 @@
-# Unreal Engine 4/5 Scripting System
+# RE-UE4SS Linux Documentation
 
-[Home](./README.md)
-[Installation](./installation-guide.md)
+[Project Home](../README.md)
+[Linux v0.1.0 Installation](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.0/packaging/linux/INSTALL.md)
 [Contributing](./contributing.md)
 [Update Migration Guide](./upgrade-guide.md)
 
@@ -117,8 +117,6 @@
 - [C++ API](./cpp-api.md)
   - [BP Macros](./cpp-api/bp-macros.md)
   - [C++ Examples](./cpp-api/cpp-examples.md)
-  - [Creating a C++ Mod](./guides/creating-a-c++-mod.md)
-  - [Installing a C++ Mod](./guides/installing-a-c++-mod.md)
   - [GUI tabs with a C++ Mod](./guides/creating-gui-tabs-with-c++-mod.md)
   - [Accessing UE properties with a C++ mod](./guides/accessing-ue-properties-c++.md)
   - [Debugging a C++ Mod](./guides/debugging-a-c++-mod.md)
@@ -126,8 +124,6 @@
 ## Guides
 
 - [Guides]()
-  - [Fixing missing AOBs](./guides/fixing-compatibility-problems.md)
-  - [Fixing missing AOBs (Advanced)](./guides/fixing-compatibility-problems-advanced.md)
   - [Generating UHT headers](./guides/generating-uht-compatible-headers.md)
 
 
