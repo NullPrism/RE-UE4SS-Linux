@@ -91,11 +91,6 @@ setup_build_configuration()
 
 # Add subdirectories for dependencies and projects
 add_subdirectory("deps")
-if(WIN32)
-    # cppmods link against the full UE4SS target; enable on Linux once libUE4SS.so links
-    add_subdirectory("cppmods")
-endif()
-
 option(UE4SS_BUILD_TESTS "Build native unit tests" OFF)
 if(UE4SS_BUILD_TESTS)
     enable_testing()

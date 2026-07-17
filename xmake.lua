@@ -56,10 +56,6 @@ on_install(function(target) end)
 
 includes("deps")
 includes("UE4SS")
-if is_plat("windows") then
-    includes("cppmods")
-end
-
 -- TODO: Remove this before the next release. It only exists to maintain backwards compat
 -- warnings for older mod templates.
 set_config("scriptsRoot", path.join(os.scriptdir(), "tools/xmakescripts"))
