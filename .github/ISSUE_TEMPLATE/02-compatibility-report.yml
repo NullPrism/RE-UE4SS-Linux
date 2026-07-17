@@ -1,0 +1,123 @@
+name: Mod compatibility report
+description: Report whether a Lua or native mod works with RE-UE4SS Linux.
+title: "[Compatibility]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for successful, partial, and unsuccessful compatibility
+        results. Submit one report for each tested mod version.
+
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Compatibility result
+      options:
+        - Works
+        - Partially works
+        - Does not work
+    validations:
+      required: true
+
+  - type: input
+    id: mod_identity
+    attributes:
+      label: Mod name and version
+      placeholder: ModName 1.2.3
+    validations:
+      required: true
+
+  - type: input
+    id: mod_source
+    attributes:
+      label: Mod source
+      description: Provide the project, Workshop, Nexus Mods, or other public URL when available.
+      placeholder: https://...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: mod_type
+    attributes:
+      label: Mod type
+      options:
+        - Lua
+        - Native C++ shared object
+        - Mixed Lua and native
+        - Unknown
+    validations:
+      required: true
+
+  - type: input
+    id: loader_release
+    attributes:
+      label: Loader release
+      placeholder: linux-v0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: loader_identity
+    attributes:
+      label: Loader SHA-256 and ELF Build ID
+      placeholder: "SHA-256: ...; Build ID: ..."
+    validations:
+      required: true
+
+  - type: input
+    id: server_identity
+    attributes:
+      label: Game and PalServer identity
+      description: Include the game version, Steam build ID, and PalServer SHA-256.
+      placeholder: "Palworld 1.0; Steam build ...; SHA-256: ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: linux_environment
+    attributes:
+      label: Linux environment
+      description: Include the distribution, kernel, glibc version, architecture, and SELinux state.
+      placeholder: |
+        Distribution:
+        Kernel:
+        Architecture:
+        glibc:
+        SELinux:
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: installation
+    attributes:
+      label: Installation and configuration
+      description: Explain where the mod was installed, how it was enabled, and any non-default settings.
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+      description: State which features worked, failed, or were not tested.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Include startup markers, errors, crashes, or other evidence. Redact secrets.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmation
+      options:
+        - label: I tested the exact mod and loader versions identified above.
+          required: true
+        - label: I removed credentials and other sensitive information.
+          required: true
