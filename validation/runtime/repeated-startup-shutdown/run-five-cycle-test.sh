@@ -11,7 +11,8 @@ crash_dir="${ue4ss_root}/UE4SS-crashes"
 mod_script="${ue4ss_root}/Mods/NullPrismLinuxAcceptance/Scripts/main.lua"
 audit_root="/home/palworld-2/loader-under-test/audit"
 prefix="[NullPrismRepeatedStartupShutdown]"
-expected_loader_sha256="1f1459b01ff3de75ea637097c0a1ef7bf141e2b2b93369351b22c16105ec1f73"
+manifest_file="${ue4ss_root}/SHA256SUMS"
+expected_loader_sha256=""
 ports=(8212 27016)
 
 [[ "$EUID" -eq 0 ]] || { echo 'ERROR: run as root.' >&2; exit 1; }
@@ -162,17 +163,47 @@ interrupt_cleanup()
 trap force_cleanup EXIT
 trap interrupt_cleanup INT TERM
 
-for path in "$launcher" "$server_elf" "$ue4ss_root/libUE4SS.so" "$mod_script"; do
+for path in "$launcher" "$server_elf" "$ue4ss_root/libUE4SS.so" "$manifest_file" "$mod_script"; do
     [[ -e "$path" ]] || { echo "ERROR: missing $path" >&2; exit 1; }
 done
+
+command -v prlimit >/dev/null || {
+    echo "ERROR: prlimit is required for coredump-capable validation." >&2
+    exit 1
+}
+
+command -v coredumpctl >/dev/null || {
+    echo "ERROR: coredumpctl is required for crash validation." >&2
+    exit 1
+}
 
 existing_pid="$(find_server_pid || true)"
 [[ -z "$existing_pid" ]] || { echo "ERROR: PalServer already running: $existing_pid" >&2; exit 1; }
 ports_clear || { echo 'ERROR: test ports are occupied.' >&2; exit 1; }
 
-loader_sha256="$(sha256sum "$ue4ss_root/libUE4SS.so" | awk '{print $1}')"
+expected_loader_sha256="$(
+    awk '
+        $2 == "./libUE4SS.so" || $2 == "libUE4SS.so" {
+            print $1
+            exit
+        }
+    ' "$manifest_file"
+)"
+
+[[ "$expected_loader_sha256" =~ ^[0-9a-fA-F]{64}$ ]] || {
+    echo "ERROR: SHA256SUMS does not contain a valid libUE4SS.so checksum." >&2
+    exit 1
+}
+
+loader_sha256="$(
+    sha256sum "$ue4ss_root/libUE4SS.so" |
+    awk '{print $1}'
+)"
+
 [[ "$loader_sha256" == "$expected_loader_sha256" ]] || {
-    echo 'ERROR: loader checksum differs from validated candidate.' >&2
+    echo 'ERROR: loader checksum differs from the package manifest.' >&2
+    echo "Expected: $expected_loader_sha256" >&2
+    echo "Actual:   $loader_sha256" >&2
     exit 1
 }
 
@@ -184,15 +215,18 @@ install -d -m 0750 -o palworld-2 -g palworld-2 "$audit_dir"
     echo "CapturedUTC=$timestamp"
     echo "Cycles=$cycles"
     echo "LoaderTarget=$(readlink -f "$ue4ss_root")"
-    sha256sum "$ue4ss_root/libUE4SS.so" "$server_elf" "$launcher" "$mod_script"
+    sha256sum "$ue4ss_root/libUE4SS.so" "$manifest_file" "$server_elf" "$launcher" "$mod_script"
 } > "$audit_dir/test-metadata.txt"
 
 if find "$crash_dir" -maxdepth 1 -type f -size +0c -print -quit | grep -q .; then
     cp -a "$crash_dir" "$audit_dir/preexisting-crashes"
 fi
 
-printf 'cycle\tstartup_seconds\tshutdown_seconds\tshutdown_sigints\tcontroller_status\tresult\n' > "$audit_dir/cycles.tsv"
+printf 'cycle\tstartup_seconds\tshutdown_seconds\tshutdown_sigints\tcontroller_status\tabort_marker\tcoredump_signal\tresult\n' > "$audit_dir/cycles.tsv"
 failures=0
+abort_cycles=0
+segmentation_fault_cycles=0
+abnormal_exit_cycles=0
 
 for cycle in $(seq 1 "$cycles"); do
     cycle_dir="${audit_dir}/$(printf 'cycle-%02d' "$cycle")"
@@ -232,6 +266,9 @@ for cycle in $(seq 1 "$cycles"); do
     shutdown_seconds=-1
     controller_status=-1
     shutdown_signal_count=0
+    core_limit_restored=0
+    abort_marker=0
+    coredump_signal="none"
 
     if [[ -z "$server_pid" ]]; then
         echo 'ERROR: PalServer process was not created.' | tee "$cycle_dir/failure.txt"
@@ -320,6 +357,52 @@ for cycle in $(seq 1 "$cycles"); do
             cycle_failed=1
         fi
 
+        echo 'Restoring PalServer soft core limit for crash diagnostics.'
+
+        if [[ -r "/proc/${server_pid}/limits" ]]; then
+            grep                 -F                 'Max core file size'                 "/proc/${server_pid}/limits"                 > "$cycle_dir/core-limit-before-restore.txt" ||
+            true
+
+            if prlimit                 --pid "$server_pid"                 --core=unlimited:unlimited; then
+
+                grep                     -F                     'Max core file size'                     "/proc/${server_pid}/limits"                     > "$cycle_dir/core-limit-after-restore.txt" ||
+                true
+
+                if awk '
+                    $1 == "Max" &&
+                    $2 == "core" &&
+                    $3 == "file" &&
+                    $4 == "size" &&
+                    $5 == "unlimited" &&
+                    $6 == "unlimited" {
+                        restored=1
+                    }
+
+                    END {
+                        exit(restored ? 0 : 1)
+                    }
+                ' "$cycle_dir/core-limit-after-restore.txt"; then
+
+                    core_limit_restored=1
+                else
+                    echo 'ERROR: PalServer core limit was not restored.' |
+                        tee -a "$cycle_dir/failure.txt"
+
+                    cycle_failed=1
+                fi
+            else
+                echo 'ERROR: prlimit failed for PalServer.' |
+                    tee -a "$cycle_dir/failure.txt"
+
+                cycle_failed=1
+            fi
+        else
+            echo 'ERROR: PalServer limits became unavailable before shutdown.' |
+                tee -a "$cycle_dir/failure.txt"
+
+            cycle_failed=1
+        fi
+
         shutdown_start_ns="$(date +%s%N)"
         shutdown_signal_count=1
 
@@ -355,6 +438,36 @@ for cycle in $(seq 1 "$cycles"); do
     active_controller=""
     active_pgid=""
 
+    if grep         -aEqi         'Aborted[[:space:]]+\(core dumped\)|Segmentation fault[[:space:]]+\(core dumped\)|terminate called after throwing|std::system_error'         "$cycle_dir/server-console.log"; then
+
+        abort_marker=1
+    fi
+
+    if [[ -n "${server_pid:-}" ]]; then
+        for attempt in {1..10}; do
+            if coredumpctl                 --no-pager                 info "$server_pid"                 > "$cycle_dir/coredump-info.txt"                 2>&1; then
+
+                coredump_signal="$(
+                    awk '
+                        /^[[:space:]]*Signal:/ {
+                            print $2
+                            exit
+                        }
+                    ' "$cycle_dir/coredump-info.txt"
+                )"
+
+                coredump_signal="${coredump_signal:-unknown}"
+                break
+            fi
+
+            sleep 1
+        done
+    fi
+
+    if [[ "$coredump_signal" == "none" ]]; then
+        echo 'No coredump record.'             > "$cycle_dir/coredump-info.txt"
+    fi
+
     for attempt in {1..60}; do
         if ports_clear; then
             ports_released=1
@@ -373,6 +486,40 @@ for cycle in $(seq 1 "$cycles"); do
     (( crash_count == 0 )) || { echo "ERROR: ${crash_count} nonempty crash file(s)." | tee -a "$cycle_dir/failure.txt"; cycle_failed=1; }
     (( avc_delta == 0 )) || { echo "ERROR: ${avc_delta} new SELinux AVC record(s)." | tee -a "$cycle_dir/failure.txt"; cycle_failed=1; }
 
+    if (( controller_status != 0 && controller_status != 130 )); then
+        echo "ERROR: unexpected controller status ${controller_status}." |
+            tee -a "$cycle_dir/failure.txt"
+
+        cycle_failed=1
+        abnormal_exit_cycles=$((abnormal_exit_cycles + 1))
+    fi
+
+    if (( abort_marker != 0 )); then
+        echo 'ERROR: fatal termination marker found in console output.' |
+            tee -a "$cycle_dir/failure.txt"
+
+        cycle_failed=1
+    fi
+
+    if [[ "$coredump_signal" != "none" ]]; then
+        echo "ERROR: coredump record reports signal ${coredump_signal}." |
+            tee -a "$cycle_dir/failure.txt"
+
+        cycle_failed=1
+    fi
+
+    if (( controller_status == 134 )) ||
+       [[ "$coredump_signal" == "6" ]]; then
+
+        abort_cycles=$((abort_cycles + 1))
+    fi
+
+    if (( controller_status == 139 )) ||
+       [[ "$coredump_signal" == "11" ]]; then
+
+        segmentation_fault_cycles=$((segmentation_fault_cycles + 1))
+    fi
+
     [[ -f "$ue4ss_log" ]] && cp -a "$ue4ss_log" "$cycle_dir/UE4SS.log"
     cp -a "$crash_dir" "$cycle_dir/UE4SS-crashes"
     ss -lunp > "$cycle_dir/listeners-after-shutdown.txt"
@@ -385,8 +532,11 @@ for cycle in $(seq 1 "$cycles"); do
         echo "GracefulShutdown=$shutdown_clean"
         echo "ShutdownSeconds=$shutdown_seconds"
         echo "ShutdownSIGINTCount=$shutdown_signal_count"
+        echo "CoreLimitRestored=$core_limit_restored"
         echo "PortsReleased=$ports_released"
         echo "ControllerStatus=$controller_status"
+        echo "AbortMarker=$abort_marker"
+        echo "CoredumpSignal=$coredump_signal"
         echo "NonemptyCrashFiles=$crash_count"
         echo "NewSELinuxAVCs=$avc_delta"
     } > "$cycle_dir/summary.txt"
@@ -398,9 +548,7 @@ for cycle in $(seq 1 "$cycles"); do
         failures=$((failures + 1))
     fi
 
-    printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
-        "$cycle" "$startup_seconds" "$shutdown_seconds" "$shutdown_signal_count" "$controller_status" "$result" \
-        >> "$audit_dir/cycles.tsv"
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n'         "$cycle"         "$startup_seconds"         "$shutdown_seconds"         "$shutdown_signal_count"         "$controller_status"         "$abort_marker"         "$coredump_signal"         "$result"         >> "$audit_dir/cycles.tsv"
 
     echo "Cycle ${cycle}: ${result}"
 done
@@ -409,6 +557,9 @@ done
     echo "RequestedCycles=$cycles"
     echo "PassedCycles=$((cycles - failures))"
     echo "FailedCycles=$failures"
+    echo "AbnormalExitCycles=$abnormal_exit_cycles"
+    echo "AbortCycles=$abort_cycles"
+    echo "SegmentationFaultCycles=$segmentation_fault_cycles"
     (( failures == 0 )) && echo 'RESULT=PASS' || echo 'RESULT=FAIL'
 } > "$audit_dir/validation-summary.txt"
 
