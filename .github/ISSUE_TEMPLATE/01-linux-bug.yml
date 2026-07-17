@@ -1,0 +1,125 @@
+name: Linux runtime bug
+description: Report a reproducible problem with the native Linux loader.
+title: "[Linux bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem.
+
+        Search existing issues first. Remove passwords, tokens, private
+        hostnames, and other sensitive information from all submitted logs.
+
+        This form is for the native Linux downstream. Problems affecting only
+        upstream Windows UE4SS should be reported to the appropriate upstream
+        project.
+
+  - type: input
+    id: loader_release
+    attributes:
+      label: Loader release
+      description: Provide the published tag or exact source commit.
+      placeholder: linux-v0.1.0
+    validations:
+      required: true
+
+  - type: input
+    id: loader_identity
+    attributes:
+      label: Loader SHA-256 and ELF Build ID
+      description: Identify the exact libUE4SS.so used for reproduction.
+      placeholder: "SHA-256: ...; Build ID: ..."
+    validations:
+      required: true
+
+  - type: input
+    id: server_identity
+    attributes:
+      label: Game and PalServer identity
+      description: Include the game version, Steam build ID, and PalServer SHA-256.
+      placeholder: "Palworld 1.0; Steam build ...; SHA-256: ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: linux_environment
+    attributes:
+      label: Linux environment
+      description: Include the distribution, kernel, glibc version, architecture, and SELinux state.
+      placeholder: |
+        Distribution:
+        Kernel:
+        Architecture:
+        glibc:
+        SELinux:
+      render: shell
+    validations:
+      required: true
+
+  - type: dropdown
+    id: loader_origin
+    attributes:
+      label: Loader origin
+      options:
+        - Published GitHub release archive
+        - Locally built from this repository
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem description
+      description: Describe what happened, including the first observable failure.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Provide complete steps beginning with a stopped dedicated server.
+      placeholder: |
+        1. Stop the dedicated server.
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: mods
+    attributes:
+      label: Enabled mods
+      description: List every enabled Lua and native mod and its version. Enter "none" for core-only testing.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and diagnostics
+      description: Attach UE4SS logs, server output, coredumpctl results, and SELinux AVCs when applicable. Redact secrets.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I removed credentials and other sensitive information.
+          required: true
+        - label: The reported hashes identify the exact server and loader used.
+          required: true
