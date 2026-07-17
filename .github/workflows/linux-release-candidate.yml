@@ -223,7 +223,7 @@ jobs:
           cat "$manifest"
 
       - name: Upload Linux release candidate
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: RE-UE4SS-Linux-${{ steps.identity.outputs.version }}-x86_64-${{ steps.identity.outputs.source_short }}
           path: |
