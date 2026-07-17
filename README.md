@@ -29,6 +29,20 @@ Source builds require authorized access to the pinned UEPseudo submodule.
 The patternsleuth submodule is public and uses HTTPS, but an anonymous
 recursive clone cannot complete without UEPseudo authorization.
 
+## Download and install
+
+The current prerelease is `linux-v0.1.0`, validated for the native Linux
+Palworld Dedicated Server version listed below.
+
+1. Download `RE-UE4SS-Linux-0.1.0-x86_64.tar.gz` from the release page.
+2. Verify the archive using the accompanying `.sha256` file.
+3. Extract the archive.
+4. Copy the package contents into `Pal/Binaries/Linux/`.
+5. Start the server using the included `run_ue4ss.sh` launcher.
+
+See the complete [installation guide](docs/linux/INSTALLATION.md) before
+enabling third-party mods.
+
 ## Validated target
 
 | Component | Validated value |
@@ -61,20 +75,6 @@ See the [Linux release policy](docs/linux/RELEASES.md), the
 [RE-UE4SS Linux v0.1.0 prerelease notes](docs/linux/RELEASE-NOTES-v0.1.0.md),
 and the
 [published release](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.0).
-
-## Download and install
-
-The current prerelease is `linux-v0.1.0`, validated for the native Linux
-Palworld Dedicated Server version listed below.
-
-1. Download `RE-UE4SS-Linux-0.1.0-x86_64.tar.gz` from the release page.
-2. Verify the archive using the accompanying `.sha256` file.
-3. Extract the archive.
-4. Copy the package contents into `Pal/Binaries/Linux/`.
-5. Start the server using the included `run_ue4ss.sh` launcher.
-
-See the complete [installation guide](docs/linux/INSTALLATION.md) before
-enabling third-party mods.
 
 ## Validated functionality
 
