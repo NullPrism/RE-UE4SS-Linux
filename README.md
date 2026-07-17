@@ -51,12 +51,16 @@ Downstream native Linux releases use the tag format
 `linux-vMAJOR.MINOR.PATCH`. This avoids ambiguity with the inherited upstream
 UE4SS tags retained in the repository.
 
-The first planned release is the `linux-v0.1.0` GitHub prerelease. Release
-assets are built from an explicitly pinned source commit and published only
-after independent package and runtime validation.
+The first downstream release,
+[`linux-v0.1.0`](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.0),
+is available as a GitHub prerelease. Its release assets were built from an
+explicitly pinned source commit and published only after independent package
+validation and a 36-cycle fresh-process runtime acceptance matrix.
 
-See the [Linux release policy](docs/linux/RELEASES.md) and the
-[RE-UE4SS Linux v0.1.0 prerelease notes](docs/linux/RELEASE-NOTES-v0.1.0.md).
+See the [Linux release policy](docs/linux/RELEASES.md), the
+[RE-UE4SS Linux v0.1.0 prerelease notes](docs/linux/RELEASE-NOTES-v0.1.0.md),
+and the
+[published release](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.0).
 
 
 ## Validated functionality
