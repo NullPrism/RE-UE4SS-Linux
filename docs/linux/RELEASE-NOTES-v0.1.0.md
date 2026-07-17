@@ -12,10 +12,13 @@ This is the first native Linux downstream prerelease of RE-UE4SS.
 - glibc-based headless runtime
 - PalServer SHA-256 `788649fa1592160faa7bcf07ccd16d474ebeaae954717bc32284b5a43028d8e7`
 - PalServer ELF build ID `7f7e167407984ec3`
-- Runtime acceptance source commit
-  `0b1c7f90a35fb2f35baf545548ea641f74418ba1`
-- Runtime-accepted packaged loader SHA-256
-  `32d903487643ec91b0fadc0f6564a2ea4064b55096ba7677d96263d01f263ba7`
+- Final acceptance matrix: 36 fresh-process cycles
+  (1 smoke, 5 core-only, 20 Lua-only, 5 native-only,
+  and 5 Lua-plus-native)
+- Runtime acceptance source: the commit referenced by the
+  `linux-v0.1.0` tag and recorded in `RELEASE-MANIFEST.txt`
+- Runtime-accepted packaged loader identity: recorded in
+  `RELEASE-MANIFEST.txt` and the package's `BUILD-METADATA.txt`
 
 The release source commit is the commit referenced by the `linux-v0.1.0` tag
 and recorded inside the package's `BUILD-METADATA.txt`.
@@ -39,7 +42,7 @@ and recorded inside the package's `BUILD-METADATA.txt`.
 
 - `RE-UE4SS-Linux-0.1.0-x86_64.tar.gz`
 - `RE-UE4SS-Linux-0.1.0-x86_64-debug.tar.gz`
-- A corresponding `.sha256` file for each archive
+- `RELEASE-MANIFEST.txt`, containing archive SHA-256 values and build identity
 
 The runtime archive contains the loader, launcher, settings, bundled mod files,
 installation documentation, provenance metadata, and internal checksums.
