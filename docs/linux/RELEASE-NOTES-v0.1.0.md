@@ -59,3 +59,4 @@ Do not unload UE4SS using `dlclose`. Stop the host process to unload the loader.
 
 - The per-mod Lua asynchronous worker is disabled on native Linux to avoid an intermittent shutdown-time `std::system_error`/SIGABRT. Standard Lua mod loading and tested Unreal hooks remain operational. Lua features that require the asynchronous worker may be unavailable.
 - One non-reproduced shutdown-time SIGSEGV occurred during extended diagnostic testing. Twenty subsequent cycles with core capture enabled completed cleanly. This is recorded as a rare shutdown observation and is not considered a blocker for the v0.1.0 prerelease.
+- Marker-free raw `LD_PRELOAD` and explicit `dlopen` auto-start are fail-closed by default. Set `UE4SS_ALLOW_LEGACY_START=1` only for deliberate legacy compatibility; the supported path is `run_ue4ss.sh`.
