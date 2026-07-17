@@ -34,13 +34,15 @@ recursive clone cannot complete without UEPseudo authorization.
 The current prerelease is `linux-v0.1.0`, validated for the native Linux
 Palworld Dedicated Server version listed below.
 
-1. Download `RE-UE4SS-Linux-0.1.0-x86_64.tar.gz` from the release page.
+1. Download `RE-UE4SS-Linux-0.1.0-x86_64.tar.gz` from the
+   [`linux-v0.1.0` prerelease page](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.0).
 2. Verify the archive using the accompanying `.sha256` file.
 3. Extract the archive.
 4. Copy the package contents into `Pal/Binaries/Linux/`.
 5. Start the server using the included `run_ue4ss.sh` launcher.
 
-See the complete [installation guide](docs/linux/INSTALLATION.md) before
+Follow the complete
+[`linux-v0.1.0` runtime installation guide](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.0/packaging/linux/INSTALL.md) before
 enabling third-party mods.
 
 ## Validated target
