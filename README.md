@@ -1,5 +1,3 @@
-[![Join the Null Prism Discord](https://img.shields.io/badge/Join%20the%20Null%20Prism%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/CC4psCt2y5)
-
 # RE-UE4SS Linux
 
 [![Native Linux](https://github.com/NullPrism/RE-UE4SS-Linux/actions/workflows/linux-test.yml/badge.svg?branch=main)](https://github.com/NullPrism/RE-UE4SS-Linux/actions/workflows/linux-test.yml)
@@ -307,8 +305,6 @@ reviewable changes.
 
 For installation help, compatibility discussion, testing coordination, and
 general project questions, join the Null Prism Discord community:
-
-[![Join the Null Prism Discord](https://img.shields.io/badge/Join%20the%20Null%20Prism%20Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/CC4psCt2y5)
 
 Use [GitHub Issues](https://github.com/NullPrism/RE-UE4SS-Linux/issues/new/choose)
 for reproducible loader bugs and compatibility reports that should be tracked
