@@ -16,6 +16,82 @@ is_elf_file() {
     [[ "$(LC_ALL=C od -An -t x1 -N4 -- "$1" | tr -d '[:space:]')" == "7f454c46" ]]
 }
 
+selinux_file_type() {
+    local context
+    local selinux_user
+    local selinux_role
+    local file_type
+    local selinux_level
+
+    context="$(stat -Lc '%C' -- "$1" 2>/dev/null || true)"
+
+    if [[ -z "${context}" || "${context}" == "?" ]]; then
+        return 1
+    fi
+
+    IFS=: read -r \
+        selinux_user \
+        selinux_role \
+        file_type \
+        selinux_level \
+        <<<"${context}"
+
+    if [[ -z "${file_type}" ]]; then
+        return 1
+    fi
+
+    printf '%s\n' "${file_type}"
+}
+
+selinux_preflight_problem() {
+    local mode="$1"
+    shift
+
+    echo "UE4SS launcher: SELinux preflight: $*" >&2
+    echo "UE4SS launcher: a game update may have replaced the labeled host executable; restore its persistent file context before launch." >&2
+
+    if [[ "${mode}" == "strict" ]]; then
+        exit 8
+    fi
+}
+
+selinux_preflight() {
+    local mode="${UE4SS_SELINUX_PREFLIGHT:-warn}"
+    local file_type
+    local expected_type="${UE4SS_EXPECTED_SELINUX_TYPE:-}"
+
+    case "${mode}" in
+        off|warn|strict)
+            ;;
+        *)
+            echo "UE4SS launcher: invalid UE4SS_SELINUX_PREFLIGHT value '${mode}'; expected off, warn, or strict" >&2
+            exit 8
+            ;;
+    esac
+
+    [[ "${mode}" != "off" ]] || return 0
+    command -v getenforce >/dev/null 2>&1 || return 0
+    [[ "$(getenforce 2>/dev/null || true)" == "Enforcing" ]] || return 0
+
+    file_type="$(selinux_file_type "${host_executable}" || true)"
+    [[ -n "${file_type}" ]] || return 0
+
+    if [[ -n "${expected_type}" && "${file_type}" != "${expected_type}" ]]; then
+        selinux_preflight_problem \
+            "${mode}" \
+            "host executable type '${file_type}' does not match UE4SS_EXPECTED_SELINUX_TYPE='${expected_type}'"
+        return 0
+    fi
+
+    case "${file_type}" in
+        user_home_t|home_root_t|default_t|unlabeled_t)
+            selinux_preflight_problem \
+                "${mode}" \
+                "host executable type '${file_type}' does not identify a scoped UE4SS SELinux entrypoint"
+            ;;
+    esac
+}
+
 host_executable=""
 if [[ "${1:-}" == "--host-executable" ]]; then
     if [[ $# -lt 3 ]]; then
@@ -56,6 +132,8 @@ if ! is_elf_file "${host_executable}"; then
     echo "UE4SS launcher: host executable is not an ELF file: ${host_executable}" >&2
     exit 7
 fi
+
+selinux_preflight
 
 export UE4SS_LAUNCH_TARGET_EXE="$(canonical_path "${host_executable}")"
 if [[ -v LD_PRELOAD ]]; then

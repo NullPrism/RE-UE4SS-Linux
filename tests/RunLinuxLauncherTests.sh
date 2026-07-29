@@ -162,4 +162,85 @@ if [[ ${non_regular_host_status} -eq 0 ]]; then
 fi
 grep -Fq 'host executable not found or not executable' <<<"${non_regular_host_output}"
 
+selinux_mock_bin="${stage_directory}/selinux mock bin"
+mkdir -p -- "${selinux_mock_bin}"
+
+cat >"${selinux_mock_bin}/getenforce" <<'MOCK_GETENFORCE'
+#!/usr/bin/env bash
+printf '%s\n' Enforcing
+MOCK_GETENFORCE
+
+cat >"${selinux_mock_bin}/stat" <<'MOCK_STAT'
+#!/usr/bin/env bash
+printf '%s\n' \
+    "${MOCK_SELINUX_CONTEXT:-unconfined_u:object_r:user_home_t:s0}"
+MOCK_STAT
+
+chmod +x \
+    "${selinux_mock_bin}/getenforce" \
+    "${selinux_mock_bin}/stat"
+
+selinux_warning_output="$(
+    env -u LD_PRELOAD \
+        PATH="${selinux_mock_bin}:${PATH}" \
+        MOCK_SELINUX_CONTEXT='unconfined_u:object_r:user_home_t:s0' \
+        UE4SS_DISABLE_AUTO_START=1 \
+        UE4SS_SELINUX_PREFLIGHT=warn \
+        "${launcher}" \
+        "${target}" \
+        2>&1
+)"
+
+grep -Fq \
+    "SELinux preflight: host executable type 'user_home_t'" \
+    <<<"${selinux_warning_output}"
+
+grep -Fq \
+    "restore its persistent file context before launch" \
+    <<<"${selinux_warning_output}"
+
+set +e
+
+selinux_strict_output="$(
+    env -u LD_PRELOAD \
+        PATH="${selinux_mock_bin}:${PATH}" \
+        MOCK_SELINUX_CONTEXT='unconfined_u:object_r:user_home_t:s0' \
+        UE4SS_DISABLE_AUTO_START=1 \
+        UE4SS_SELINUX_PREFLIGHT=strict \
+        UE4SS_EXPECTED_SELINUX_TYPE=palworld_ue4ss_exec_t \
+        "${launcher}" \
+        "${target}" \
+        2>&1
+)"
+
+selinux_strict_status=$?
+
+set -e
+
+if [[ ${selinux_strict_status} -ne 8 ]]; then
+    echo "strict SELinux preflight returned ${selinux_strict_status}, expected 8" >&2
+    exit 12
+fi
+
+grep -Fq \
+    "does not match UE4SS_EXPECTED_SELINUX_TYPE='palworld_ue4ss_exec_t'" \
+    <<<"${selinux_strict_output}"
+
+selinux_matching_output="$(
+    env -u LD_PRELOAD \
+        PATH="${selinux_mock_bin}:${PATH}" \
+        MOCK_SELINUX_CONTEXT='system_u:object_r:palworld_ue4ss_exec_t:s0' \
+        UE4SS_DISABLE_AUTO_START=1 \
+        UE4SS_SELINUX_PREFLIGHT=strict \
+        UE4SS_EXPECTED_SELINUX_TYPE=palworld_ue4ss_exec_t \
+        "${launcher}" \
+        "${target}" \
+        2>&1
+)"
+
+if grep -Fq 'SELinux preflight:' <<<"${selinux_matching_output}"; then
+    echo "strict SELinux preflight warned for the expected host type" >&2
+    exit 13
+fi
+
 rm -rf -- "${stage_directory}"
