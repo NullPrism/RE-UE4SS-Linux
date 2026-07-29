@@ -31,55 +31,62 @@ recursive clone cannot complete without UEPseudo authorization.
 
 ## Download and install
 
-The current prerelease is `linux-v0.1.0`, validated for the native Linux
+The current prerelease is `linux-v0.1.1`, validated for the native Linux
 Palworld Dedicated Server version listed below.
 
-1. Download `RE-UE4SS-Linux-0.1.0-x86_64.tar.gz` from the
-   [`linux-v0.1.0` prerelease page](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.0).
+1. Download `RE-UE4SS-Linux-0.1.1-x86_64.tar.gz` from the
+   [`linux-v0.1.1` prerelease page](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.1).
 2. Verify the archive using the accompanying `.sha256` file.
 3. Extract the archive.
 4. Copy the package contents into `Pal/Binaries/Linux/`.
-5. Start the server using the included `run_ue4ss.sh` launcher.
+5. Apply the documented persistent SELinux context when using the scoped
+   SELinux policy.
+6. Start the server using the included `run_ue4ss.sh` launcher.
 
 Follow the complete
-[`linux-v0.1.0` runtime installation guide](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.0/packaging/linux/INSTALL.md) before
-enabling third-party mods.
+[`linux-v0.1.1` runtime installation guide](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.1/packaging/linux/INSTALL.md)
+before enabling third-party mods.
 
 ## Validated target
 
 | Component | Validated value |
 |---|---|
 | Game | Palworld Dedicated Server |
-| Game version | 1.0.1.100619 |
-| Steam build ID | 24181105 |
+| Game version | 1.0.2.100933 |
+| Steam build ID | 24370498 |
 | Unreal Engine | 5.1.1 |
 | Architecture | x86-64 |
-| Distribution | Fedora Linux |
-| Loading method | Process-lifetime `LD_PRELOAD` |
+| Distribution | Fedora Linux 43 |
+| Loading method | Process-lifetime `LD_PRELOAD` through the process-scoped launcher |
+| PalServer SHA-256 | `d16b4d840a30dc3f467fe1059a0088ddb08a4b513cc45150767cba1785867d30` |
+| PalServer ELF build ID | `c339de6590a6a669` |
 | Imported Linux baseline | `407d14cf3c485a150cd157fd581643c901dd9b0e` |
 
 See the complete [Linux compatibility matrix](docs/linux/COMPATIBILITY.md).
 
-
 ## Releases
 
 Downstream native Linux releases use the tag format
-`linux-vMAJOR.MINOR.PATCH`. This avoids ambiguity with the inherited upstream
+`linux-vMAJOR.MINOR.PATCH`. This avoids ambiguity with inherited upstream
 UE4SS tags retained in the repository.
 
-The first downstream release,
+The current patch prerelease is
+[`linux-v0.1.1`](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.1).
+It adds SELinux host-label preflight checks, documents recovery after game
+updates replace the server executable, and updates the validated Palworld
+target to `1.0.2.100933`.
+
+The first downstream prerelease,
 [`linux-v0.1.0`](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.0),
-is available as a GitHub prerelease. Its release assets were built from an
-explicitly pinned source commit and published only after independent package
-validation and a 36-cycle fresh-process runtime acceptance matrix.
+remains available as the historical initial Linux release.
 
 See the [Linux release policy](docs/linux/RELEASES.md), the
-[RE-UE4SS Linux v0.1.0 prerelease notes](docs/linux/RELEASE-NOTES-v0.1.0.md),
+[RE-UE4SS Linux v0.1.1 prerelease notes](docs/linux/RELEASE-NOTES-v0.1.1.md),
 and the
-[published release](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.0).
+[published v0.1.1 release](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.1).
 
-For end-user installation from the published runtime archive, follow the
-[`linux-v0.1.0` runtime installation guide](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.0/packaging/linux/INSTALL.md).
+For end-user installation from the current runtime archive, follow the
+[`linux-v0.1.1` runtime installation guide](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.1/packaging/linux/INSTALL.md).
 
 ## Validated functionality
 
@@ -274,9 +281,11 @@ reclaimed the module when the host process terminated.
 
 ## Documentation
 
-- [`linux-v0.1.0` runtime installation guide](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.0/packaging/linux/INSTALL.md)
+- [`linux-v0.1.1` runtime installation guide](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.1/packaging/linux/INSTALL.md)
+- [RE-UE4SS Linux v0.1.1 prerelease notes](docs/linux/RELEASE-NOTES-v0.1.1.md)
 - [Native Linux build, staging, launch, and diagnostics](docs/linux.md)
 - [Compatibility matrix](docs/linux/COMPATIBILITY.md)
+- [Linux release policy](docs/linux/RELEASES.md)
 - [Source provenance](docs/linux/PROVENANCE.md)
 - [Validation fixtures and recorded results](validation/)
 - [Single-process native C++ loading result](validation/native/cpp-mod-loading/RESULT-PALWORLD-24181105.md)

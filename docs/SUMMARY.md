@@ -1,7 +1,7 @@
 # RE-UE4SS Linux Documentation
 
 [Project Home](../README.md)
-[Linux v0.1.0 Installation](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.0/packaging/linux/INSTALL.md)
+[Linux v0.1.1 Installation](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.1/packaging/linux/INSTALL.md)
 [Contributing](./contributing.md)
 [Update Migration Guide](./upgrade-guide.md)
 
