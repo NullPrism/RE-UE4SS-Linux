@@ -148,6 +148,62 @@ Windows does not need this policy: proxy DLL and manual DLL injection load UE4SS
 
 Marker-free manual `LD_PRELOAD` and explicit `dlopen` do not auto-start UE4SS by default. Use `run_ue4ss.sh` for the supported process-scoped workflow. Deliberate legacy compatibility can be enabled with `UE4SS_ALLOW_LEGACY_START=1`, but that mode retains normal Linux child inheritance and may initialize UE4SS in descendant or helper processes. If the user's original `LD_PRELOAD` already contains UE4SS, exact preservation takes precedence.
 
+## SELinux preflight and game updates
+
+Do not enable the global `execheap` boolean solely for UE4SS. Use a narrowly
+scoped SELinux domain that permits executable trampoline memory only for the
+intended UE4SS-enabled host process.
+
+The launcher supports these SELinux preflight modes:
+
+```bash
+UE4SS_SELINUX_PREFLIGHT=off
+UE4SS_SELINUX_PREFLIGHT=warn
+UE4SS_SELINUX_PREFLIGHT=strict
+```
+
+The default is `warn`. A scoped deployment should also identify the expected
+entrypoint type:
+
+```bash
+UE4SS_SELINUX_PREFLIGHT=strict \
+UE4SS_EXPECTED_SELINUX_TYPE=palworld_ue4ss_exec_t \
+  "$stage/run_ue4ss.sh" \
+  --host-executable "$server" \
+  "$wrapper"
+```
+
+When SELinux is Enforcing, `strict` mode exits with status 8 if the host
+executable does not have the expected type. This prevents a later executable
+trampoline fault when the process fails to transition into its scoped domain.
+
+Game updates and validation operations can replace the host executable with a
+new inode. The replacement may receive the directory's default SELinux type
+instead of the persistent custom entrypoint type.
+
+Define a persistent file-context mapping once:
+
+```bash
+semanage fcontext -a \
+  -t palworld_ue4ss_exec_t \
+  '/srv/palworld/Pal/Binaries/Linux/PalServer-Linux-Shipping'
+```
+
+After every game update or validation, restore the configured context before
+starting UE4SS:
+
+```bash
+restorecon -Fv \
+  /srv/palworld/Pal/Binaries/Linux/PalServer-Linux-Shipping
+
+matchpathcon -V \
+  /srv/palworld/Pal/Binaries/Linux/PalServer-Linux-Shipping
+```
+
+Use `semanage fcontext -m` instead of `-a` when changing an existing mapping.
+Do not rely on `chcon`; it changes the current label without defining the
+persistent file-context rule.
+
 ## Diagnostics and logs
 
 Set `UE4SS_DIAGNOSE=1` for a support-oriented startup report:

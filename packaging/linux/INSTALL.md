@@ -112,6 +112,62 @@ When no wrapper is required:
       -NoAsyncLoadingThread \
       -UseMultithreadForDS
 
+## SELinux preflight and game updates
+
+Do not enable the global `execheap` boolean solely for UE4SS. Use a narrowly
+scoped SELinux domain that permits executable trampoline memory only for the
+intended UE4SS-enabled host process.
+
+The launcher supports these SELinux preflight modes:
+
+```bash
+UE4SS_SELINUX_PREFLIGHT=off
+UE4SS_SELINUX_PREFLIGHT=warn
+UE4SS_SELINUX_PREFLIGHT=strict
+```
+
+The default is `warn`. A scoped deployment should also identify the expected
+entrypoint type:
+
+```bash
+UE4SS_SELINUX_PREFLIGHT=strict \
+UE4SS_EXPECTED_SELINUX_TYPE=palworld_ue4ss_exec_t \
+  "$stage/run_ue4ss.sh" \
+  --host-executable "$server" \
+  "$wrapper"
+```
+
+When SELinux is Enforcing, `strict` mode exits with status 8 if the host
+executable does not have the expected type. This prevents a later executable
+trampoline fault when the process fails to transition into its scoped domain.
+
+Game updates and validation operations can replace the host executable with a
+new inode. The replacement may receive the directory's default SELinux type
+instead of the persistent custom entrypoint type.
+
+Define a persistent file-context mapping once:
+
+```bash
+semanage fcontext -a \
+  -t palworld_ue4ss_exec_t \
+  '/srv/palworld/Pal/Binaries/Linux/PalServer-Linux-Shipping'
+```
+
+After every game update or validation, restore the configured context before
+starting UE4SS:
+
+```bash
+restorecon -Fv \
+  /srv/palworld/Pal/Binaries/Linux/PalServer-Linux-Shipping
+
+matchpathcon -V \
+  /srv/palworld/Pal/Binaries/Linux/PalServer-Linux-Shipping
+```
+
+Use `semanage fcontext -m` instead of `-a` when changing an existing mapping.
+Do not rely on `chcon`; it changes the current label without defining the
+persistent file-context rule.
+
 ## Diagnostics
 
 Enable the Linux startup diagnostic report with:
@@ -131,11 +187,3 @@ Review:
 Do not unload `libUE4SS.so` or native C++ mods with `dlclose`.
 
 Stop the host game process to unload the loader and its native mods.
-
-## SELinux
-
-Do not enable global `execheap` solely for UE4SS.
-
-The validated Palworld environment used a narrowly scoped SELinux domain and
-policy for the isolated UE4SS-enabled server process. Deployments using SELinux
-should apply an equally restricted local policy.
