@@ -47,22 +47,25 @@ Follow the complete
 [`linux-v0.1.1` runtime installation guide](https://github.com/NullPrism/RE-UE4SS-Linux/blob/linux-v0.1.1/packaging/linux/INSTALL.md)
 before enabling third-party mods.
 
-## Validated target
+## Latest validated target
 
 | Component | Validated value |
 |---|---|
 | Game | Palworld Dedicated Server |
-| Game version | 1.0.2.100933 |
-| Steam build ID | 24370498 |
+| Game version | 1.0.2.100993 |
+| Steam build ID | 24445026 |
 | Unreal Engine | 5.1.1 |
 | Architecture | x86-64 |
 | Distribution | Fedora Linux 43 |
 | Loading method | Process-lifetime `LD_PRELOAD` through the process-scoped launcher |
-| PalServer SHA-256 | `d16b4d840a30dc3f467fe1059a0088ddb08a4b513cc45150767cba1785867d30` |
-| PalServer ELF build ID | `c339de6590a6a669` |
+| PalServer SHA-256 | `f1d8ced330d8933bf077040dbf62c11f9ebf79d299369d16ba736ea36afda01b` |
+| PalServer ELF build ID | `12db0eec6678474d` |
 | Imported Linux baseline | `407d14cf3c485a150cd157fd581643c901dd9b0e` |
 
 See the complete [Linux compatibility matrix](docs/linux/COMPATIBILITY.md).
+The original `linux-v0.1.1` release acceptance used Palworld `1.0.2.100933`.
+The unchanged published package was subsequently validated against `1.0.2.100993`;
+see the [post-release validation record](validation/runtime/palworld-1.0.2.100993/RESULT.md).
 
 ## Releases
 
@@ -73,8 +76,9 @@ UE4SS tags retained in the repository.
 The current patch prerelease is
 [`linux-v0.1.1`](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.1).
 It adds SELinux host-label preflight checks, documents recovery after game
-updates replace the server executable, and updates the validated Palworld
-target to `1.0.2.100933`.
+updates replace the server executable, and established Palworld
+`1.0.2.100933` as the original release-acceptance target. The unchanged
+published package was subsequently validated against `1.0.2.100993`.
 
 The first downstream prerelease,
 [`linux-v0.1.0`](https://github.com/NullPrism/RE-UE4SS-Linux/releases/tag/linux-v0.1.0),
