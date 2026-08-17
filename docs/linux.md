@@ -23,7 +23,7 @@ These results apply only to the exact combinations recorded in the [compatibilit
 ## Requirements
 
 - x86-64 Linux
-- glibc 2.35 or newer
+- glibc 2.39 or newer for the published `linux-v0.1.1` runtime
 - libstdc++ exposing `GLIBCXX_3.4.32` or newer
 - clang with C++23 support; GCC is not a supported compiler for this port
 - CMake 3.22 or newer and Ninja, or xmake 2.9.3
@@ -39,7 +39,7 @@ strings "$(clang++ -print-file-name=libstdc++.so.6)" \
   | tail -n 1
 ```
 
-The second command must print `GLIBCXX_3.4.32` or a later version. A binary built on a newer distribution can acquire newer ABI requirements, so release artifacts should be produced in the project's baseline build environment.
+The second command must print `GLIBCXX_3.4.32` or a later version. The published `linux-v0.1.1` loader has been verified to require `GLIBC_2.39`. A source build may acquire different ABI requirements depending on the build environment, so check the resulting `libUE4SS.so` directly when building from source.
 
 The repository contains two pinned submodules:
 

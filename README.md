@@ -141,7 +141,7 @@ the official upstream UE4SS project.
 The current Linux build requires:
 
 - x86-64 Linux
-- glibc 2.35 or newer
+- glibc 2.39 or newer for the published `linux-v0.1.1` runtime
 - Clang with C++23 support
 - CMake 3.22 or newer and Ninja, or xmake 2.9.3
 - Rust 1.73 or newer
