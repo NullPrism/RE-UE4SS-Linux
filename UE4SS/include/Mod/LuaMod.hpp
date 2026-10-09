@@ -191,20 +191,22 @@ namespace RC
 
       public:
         LuaMod(UE4SSProgram&, StringType&& mod_name, std::filesystem::path mod_path);
-        ~LuaMod() override = default;
+        // Members are destroyed in reverse declaration order, so m_actions_lock
+        // (declared after m_async_thread) would go while the worker can still
+        // lock it. Stop and join the worker before any member is destroyed.
+        ~LuaMod() override
+        {
+            if (m_async_thread.joinable())
+            {
+                m_async_thread.request_stop();
+                m_async_thread.join();
+            }
+        }
 
       private:
         auto start_async_thread() -> void
         {
-#ifdef __linux__
-            // Native Linux currently disables the per-mod asynchronous worker
-            // because its shutdown path can intermittently terminate the host
-            // process. Lua features that depend on update_async are unavailable
-            // until the thread lifecycle is made safe on Linux.
-            return;
-#else
             m_async_thread = std::jthread{&Mod::update_async, this};
-#endif
         }
 
       private:
