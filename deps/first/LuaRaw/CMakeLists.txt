@@ -4,7 +4,17 @@ set(TARGET LuaRaw)
 project(${TARGET})
 
 option(UE4SS_${TARGET}_BUILD_SHARED "Build as a shared lib" OFF)
-option(LUA_COMPILE_AS_CPP "Compile Lua as C++ instead of C" OFF)
+# On Linux, Lua compiled as C raises errors with longjmp, which skips the C++
+# destructors of every frame it crosses: a lock_guard held by a Lua-callable
+# function that raises an error (RegisterHook on a class not loaded yet) is never
+# released. Compiled as C++, a Lua error is a C++ exception and unwinds them.
+# MSVC's longjmp already runs destructors, so Windows keeps the C build.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(_lua_compile_as_cpp_default ON)
+else()
+    set(_lua_compile_as_cpp_default OFF)
+endif()
+option(LUA_COMPILE_AS_CPP "Compile Lua as C++ instead of C" ${_lua_compile_as_cpp_default})
 
 set(${TARGET}_Sources
         "${CMAKE_CURRENT_SOURCE_DIR}/src/lapi.c"
