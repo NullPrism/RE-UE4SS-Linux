@@ -27,6 +27,15 @@ if [[ ! -x "$compiler" ]]; then
     exit 1
 fi
 
+# Linked ahead of -lUE4SS so the mod's operator new/delete come from it and not
+# from libUE4SS.so's export (see the check after the link).
+static_libstdcxx="$("$compiler" -print-file-name=libstdc++.a)"
+
+if [[ ! -f "$static_libstdcxx" ]]; then
+    echo "ERROR: static libstdc++ not found: $static_libstdcxx" >&2
+    exit 1
+fi
+
 if [[ ! -f "$loader_library" ]]; then
     echo "ERROR: loader library not found:" >&2
     echo "$loader_library" >&2
@@ -191,6 +200,7 @@ rm -f "$output_file"
     -Wno-missing-braces \
     "$source_file" \
     -shared \
+    "$static_libstdcxx" \
     -L"$loader_dir" \
     -Wl,--no-as-needed \
     -lUE4SS \
@@ -202,6 +212,17 @@ rm -f "$output_file"
     '-Wl,-rpath,$ORIGIN/../../..' \
     -Wl,-soname,main.so \
     -o "$output_file"
+
+# The mod must allocate the way libUE4SS.so does. libUE4SS.so links
+# libstdc++ statically with -Bsymbolic, so its operator new/delete are its own.
+# A mod that leaves them undefined binds at run time to the game executable's,
+# which allocate from FMallocBinned2, and frees what the loader allocated
+# (FName::ToString() results, containers it fills) with the wrong allocator.
+if nm -D --undefined-only "$output_file" |
+    grep -qE '[[:space:]](_Znwm|_ZdlPv|_ZdlPvm|_Znam|_ZdaPv)$'; then
+    echo "ERROR: $output_file imports operator new/delete." >&2
+    exit 1
+fi
 
 echo "Built native acceptance mod:"
 echo "$output_file"
