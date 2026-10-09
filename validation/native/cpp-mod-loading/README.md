@@ -35,6 +35,13 @@ configuration, C++ runtime strategy, and loader ABI as the tested
 
 The build script verifies the expected loader SHA-256 before compilation.
 
+The mod links `libstdc++.a` ahead of `-lUE4SS`, so its `operator new` and
+`operator delete` are its own, like the loader's; the build fails if the mod
+imports them. A mod that imports them binds to the game executable's, which
+allocate from `FMallocBinned2`, and frees memory the loader allocated (an
+`FName::ToString()` result, a container the loader filled) with the wrong
+allocator: `FMallocBinned2 Attempt to realloc an unrecognized block`.
+
 Generated files under `build/` are not committed.
 
 ## Installation layout
