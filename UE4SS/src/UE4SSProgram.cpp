@@ -77,6 +77,11 @@
 
 namespace RC
 {
+#ifdef __linux__
+    // Platform/Linux/EntryLinux.cpp: static_cleanup, at most once per process.
+    auto linux_exit_teardown() -> void;
+#endif
+
     // Commented out because this system (turn off hotkeys when in-game console is open) it doesn't work properly.
     /*
     struct RC_UE_API FUEDeathListener : public Unreal::FUObjectCreateListener
@@ -450,6 +455,23 @@ namespace RC
         // Shut down the event loop
         m_processing_events = false;
 
+#ifdef __linux__
+        // The init thread is blocked in m_event_loop.join() and reads this object
+        // after it returns. Destroying m_event_loop while it waits would join the
+        // same thread a second time, which blocks forever in pthread_join. Let the
+        // init thread finish. If the loop never ends, hand the thread to a leaked
+        // object: a second join or a detach of a thread being joined is undefined.
+        for (int waited_ms = 0; init_thread_running.load(std::memory_order_acquire) && waited_ms < 10000; waited_ms += 10)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+        if (init_thread_running.load(std::memory_order_acquire) && m_event_loop.joinable())
+        {
+            Output::send<LogLevel::Warning>(STR("Event loop did not stop within 10 s; exiting without joining it\n"));
+            [[maybe_unused]] auto* abandoned = new std::jthread{std::move(m_event_loop)};
+        }
+#endif
+
         // It's possible that main() will destroy the default devices (they are static)
         // However it's also possible that this program object is constructed in a context where main() is not gonna immediately exit
         // Because of that and because the default devices are created in the constructor, it's preferred to explicitly close all default devices in the destructor
@@ -487,6 +509,13 @@ namespace RC
             // Only deal with the event loop thread here if the 'Test' constructor doesn't need to be called
 #ifndef RUN_TESTS
             // Program is now fully setup
+#ifdef __linux__
+            // Tear down from exit() while the statics that logging and the mods
+            // use still exist. Exit handlers run in reverse registration order, so
+            // this one runs before the destructors of everything constructed so
+            // far; the shared-object destructor would run after all of them.
+            std::atexit([] { linux_exit_teardown(); });
+#endif
             // Start event loop
             m_event_loop = std::jthread{&UE4SSProgram::update, this};
 

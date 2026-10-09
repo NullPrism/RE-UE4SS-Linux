@@ -102,6 +102,9 @@ namespace RC
         RC_UE4SS_API static SettingsManager settings_manager;
         static inline bool unreal_is_shutting_down{};
         static inline std::atomic_bool cpp_mods_done_loading{};
+        // True while the Linux init thread runs: it joins m_event_loop and then
+        // still reads the program, so the destructor waits for it to clear.
+        static inline std::atomic_bool init_thread_running{};
 
       public:
         bool m_is_program_started;
