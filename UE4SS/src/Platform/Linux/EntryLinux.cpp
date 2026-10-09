@@ -44,6 +44,15 @@ namespace
 
     auto thread_so_start(std::filesystem::path module_path) -> void
     {
+        UE4SSProgram::init_thread_running.store(true, std::memory_order_release);
+        struct InitThreadDone
+        {
+            ~InitThreadDone()
+            {
+                UE4SSProgram::init_thread_running.store(false, std::memory_order_release);
+            }
+        } init_thread_done;
+
         s_runtime_ready.wait(false, std::memory_order_acquire);
         try
         {
@@ -242,7 +251,7 @@ __attribute__((constructor(65535))) static void ue4ss_runtime_ready()
     s_runtime_ready.notify_all();
 }
 
-__attribute__((destructor)) static void ue4ss_so_detached()
+static void ue4ss_teardown_once()
 {
     if (s_ue4ss_started.exchange(false))
     {
@@ -252,9 +261,26 @@ __attribute__((destructor)) static void ue4ss_so_detached()
         }
         catch (...)
         {
-            std::fputs("UE4SS: cleanup failed during shared-object unload\n", stderr);
+            std::fputs("UE4SS: cleanup failed during shutdown\n", stderr);
         }
     }
+}
+
+namespace RC
+{
+    // Registered with std::atexit by UE4SSProgram::init; see there.
+    auto linux_exit_teardown() -> void
+    {
+        ue4ss_teardown_once();
+    }
+} // namespace RC
+
+// The fallback for an unload without exit(). At exit() this runs from _dl_fini,
+// after the C++ statics of this library are destroyed, so the atexit handler has
+// normally torn down already and this does nothing.
+__attribute__((destructor)) static void ue4ss_so_detached()
+{
+    ue4ss_teardown_once();
 }
 
 #endif // __linux__
