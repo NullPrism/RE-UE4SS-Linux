@@ -429,6 +429,8 @@ Fixed PalServer crashing when debug console is enabled in `UE4SS-settings.ini` (
 
 Fixed PalServer console having broken text when running under Proton/Wine ([UE4SS #1160](https://github.com/UE4SS-RE/RE-UE4SS/pull/1160)) - Okaetsu
 
+Fixed non-ASCII text (e.g. Japanese) passed from Lua to an `FString` being garbled. `to_u16string(const std::string&)` now decodes UTF-8 instead of widening each byte.
+
 ### Live View 
 Fixed the "Write to file" checkbox not working for functions in the `Watches` tab ([UE4SS #419](https://github.com/UE4SS-RE/RE-UE4SS/pull/419)) 
 
