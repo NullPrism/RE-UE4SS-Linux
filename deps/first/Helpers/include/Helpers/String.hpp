@@ -284,9 +284,22 @@ namespace RC
         return to_u16string(temp_input);
     }
 
+    // Decodes UTF-8 into UTF-16.
+    // Invalid UTF-8 yields U+FFFD (wstring_convert replaces the whole result) instead of throwing.
+    // The std::string_view overload below forwards here.
     auto inline to_u16string(const std::string& input) -> std::u16string
     {
-        return {input.begin(), input.end()};
+#if __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+#pragma warning(disable : 4996)
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter{"", u"\uFFFD"};
+        return converter.from_bytes(input.data(), input.data() + input.length());
+#pragma warning(default : 4996)
+#if __clang__
+#pragma clang diagnostic pop
+#endif
     }
 
     auto inline to_u16string(std::string_view input) -> std::u16string
