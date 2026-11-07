@@ -77,6 +77,11 @@ target_compile_definitions(${TARGET}
             RC_${MODULE_NAME}_BUILD_STATIC>
         $<$<BOOL:${LUA_COMPILE_AS_CPP}>:LUA_COMPILED_AS_CPP>)
             
+# Enable Lua's dynamic C module loading (dlopen) on Linux, like LUA_USE_WINDOWS does on Windows.
+# Without this, package.loadlib and require of C modules fail with "dynamic libraries not enabled".
+target_compile_definitions(${TARGET} PRIVATE $<$<PLATFORM_ID:Linux>:LUA_USE_LINUX>)
+target_link_libraries(${TARGET} PUBLIC ${CMAKE_DL_LIBS})
+
 # Make headers visible in the IDE
 # Uses make_headers_visible() from cmake/modules/IDEVisibility.cmake
 make_headers_visible(${TARGET} "${CMAKE_CURRENT_SOURCE_DIR}/include")
